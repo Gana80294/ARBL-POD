@@ -1,0 +1,161 @@
+@import "src/@fuse/scss/fuse";
+#invoiceItem {
+  .progressBarPostion {
+    position: absolute !important;
+    bottom: 50%;
+    z-index: 1;
+    left: 55%;
+  }
+  .example-container {
+    max-height: 400px;
+    overflow: auto;
+}
+  .center {
+    padding: 5px !important;
+  }
+  .cardHeader {
+    background-color: #fffdf9;
+    height: 50px;
+  }
+  .boldClass {
+    font-weight: bold;
+  }
+  .sidenav-content {
+    background-color: white;
+  }
+  .boldItalicClass {
+    @extend .boldClass;
+    font-style: italic;
+  }
+
+  .semiBoldClass {
+    font-weight: 500;
+  }
+
+  .subTitle {
+    @extend .semiBoldClass;
+    font-size: 14px;
+    text-decoration: var(--textDec);
+  }
+
+  .fontSize {
+    font-size: var(--siz);
+  }
+
+  .mt-2 {
+    margin-top: 2px !important;
+  }
+
+  .labelClass {
+    @extend .boldClass;
+    margin-top: 8px;
+  }
+
+  @mixin TableBorderRight($color) {
+    border-right: 1px solid $color;
+  }
+
+  .TablePadFont {
+    padding: 5px;
+    font-size: 12px;
+    min-width: 100px !important;
+  }
+
+  table {
+    width: 100%;
+
+    th {
+      @include TableBorderRight(#e0e0e0);
+      @extend .TablePadFont;
+      color: white;
+      background-color: #121214;
+    }
+
+    td {
+      @include TableBorderRight(#ffffff);
+      @extend .TablePadFont;
+      font-size: 12px;
+      min-width: max-content !important;
+    }
+
+    tr {
+      height: 40px;
+    }
+
+    .mat-input-element:disabled {
+      color: gray !important;
+      background: whitesmoke !important;
+      cursor: not-allowed !important;
+    }
+  }
+  table.customtable {
+    border: 1px solid black;
+    border-collapse: collapse;
+    td {
+      border: 1px solid black;
+    }
+  }
+  @mixin BorderMixin($t, $r, $b, $l, $color) {
+    border-color: $color;
+    border-style: solid;
+    border-top-width: $t;
+    border-right-width: $r;
+    border-bottom-width: $b;
+    border-left-width: $l;
+  }
+  .cardBorder {
+    @include BorderMixin(0px, 0px, 0px, 5px, #efb577);
+  }
+  .materialColor {
+    color: #efb577;
+  }
+  .confirmBtn {
+    background-color: #efb577 !important;
+    color: white;
+  }
+  .saveBtn {
+    color: #efb577 !important;
+    background-color: white;
+  }
+  .errorClass {
+    margin-bottom: 8px;
+  }
+  .orangeBorderBottom {
+    border-bottom: 2px solid #fb7800;
+  }
+}
+
+#abnormal {
+  .mat-form-field-flex>.mat-form-field-infix {
+      padding: 0.3em 0px !important;
+      width: 100px !important;
+  }
+
+  .mat-form-field-label-wrapper {
+      top: -1.5em;
+  }
+
+  .mat-form-field-appearance-outline.mat-form-field-can-float.mat-form-field-should-float .mat-form-field-label {
+      transform: translateY(-1.1em) scale(0.75);
+      width: 133.33333%;
+  }
+
+  .mat-form-field-wrapper {
+      margin: 0 !important;
+      padding-bottom: 4px !important;
+      padding-top: 4px !important;
+      padding-right: 10px !important;
+  }
+
+  .mat-form-field-appearance-outline .mat-form-field-flex {
+      padding: 0 0.4em 0 0.4em;
+  }
+}
+.mat-err-msg{
+  font-size: 10px !important;
+  max-width: 136px !important;
+}
+.rpod-detail-table{
+  max-height: 400px;
+  overflow: auto;
+}

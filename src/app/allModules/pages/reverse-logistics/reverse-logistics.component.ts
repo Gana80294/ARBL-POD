@@ -33,6 +33,7 @@ import { ReversePodService } from "app/services/reverse-pod.service";
 import { ChartType } from "chart.js";
 import { Guid } from "guid-typescript";
 import { saveAs } from "file-saver";
+import { ShareParameterService } from "app/services/share-parameters.service";
 
 @Component({
     selector: "app-reverse-logistics",
@@ -98,22 +99,22 @@ export class ReverseLogisticsComponent implements OnInit {
         "Claim_Type",
         "Customer_Name",
         "Plant_Name",
-        "Material_Code",
-        "Quantity",
-        "Customer_Delivery_Quantity",
-        "Customer_Pending_Quantity",
+        // "Material_Code",
+        // "Quantity",
+        // "Customer_Delivery_Quantity",
+        // "Customer_Pending_Quantity",
         // "Handovered_Status",
         "LR_Number",
         "LR_Date",
         "CustomerLR",
-        "DC_Received_Quantity",
-        "DC_Pending_Quantity",
+        // "DC_Received_Quantity",
+        // "DC_Pending_Quantity",
         "DC_Received_Date",
         "DC_Acknowledgement_Date",
         "Received_Status",
         "DCLR",
         "PENDING_DAYS",
-        "Remarks",
+        // "Remarks",
     ];
     dataSource = new MatTableDataSource<ReversePOD>();
     @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -147,7 +148,8 @@ export class ReverseLogisticsComponent implements OnInit {
         public snackBar: MatSnackBar,
         public _reversePod: ReversePodService,
         private _datePipe: DatePipe,
-        private dialog: MatDialog
+        private dialog: MatDialog,
+        private _shareParameterService: ShareParameterService,
     ) {
         this.notificationSnackBarComponent = new NotificationSnackBarComponent(
             this.snackBar
@@ -233,7 +235,7 @@ export class ReverseLogisticsComponent implements OnInit {
             this.InvoiceFilterFormGroup.get("PlantList").value &&
             this.InvoiceFilterFormGroup.get("PlantList").value.length > 0
                 ? this.InvoiceFilterFormGroup.get("PlantList").value
-                : this.authenticationDetails.plant.split(",");
+                : this.authenticationDetails.plant ? this.authenticationDetails.plant.split(",") : [];
 
         filterPayload.UserCode =
             this.InvoiceFilterFormGroup.get("UserCode").value;
@@ -283,7 +285,7 @@ export class ReverseLogisticsComponent implements OnInit {
             this.InvoiceFilterFormGroup.get("PlantList").value &&
             this.InvoiceFilterFormGroup.get("PlantList").value.length > 0
                 ? this.InvoiceFilterFormGroup.get("PlantList").value
-                : this.authenticationDetails.plant.split(",");
+                : this.authenticationDetails.plant ? this.authenticationDetails.plant.split(",") : [];
         isCustomer
             ? (filterPayload.UserCode = this.authenticationDetails.userCode)
             : (filterPayload.UserCode = null);
@@ -324,7 +326,7 @@ export class ReverseLogisticsComponent implements OnInit {
             this.InvoiceFilterFormGroup.get("PlantList").value &&
             this.InvoiceFilterFormGroup.get("PlantList").value.length > 0
                 ? this.InvoiceFilterFormGroup.get("PlantList").value
-                : this.authenticationDetails.plant.split(",");
+                : this.authenticationDetails.plant ? this.authenticationDetails.plant.split(",") : [];
         isCustomer
             ? (filterPayload.UserCode = this.authenticationDetails.userCode)
             : (filterPayload.UserCode = null);
@@ -367,7 +369,7 @@ export class ReverseLogisticsComponent implements OnInit {
             this.InvoiceFilterFormGroup.get("PlantList").value &&
             this.InvoiceFilterFormGroup.get("PlantList").value.length > 0
                 ? this.InvoiceFilterFormGroup.get("PlantList").value
-                : this.authenticationDetails.plant.split(",");
+                : this.authenticationDetails.plant ? this.authenticationDetails.plant.split(",") : [];
         isCustomer
             ? (filterPayload.UserCode = this.authenticationDetails.userCode)
             : (filterPayload.UserCode = null);
@@ -410,7 +412,7 @@ export class ReverseLogisticsComponent implements OnInit {
             this.InvoiceFilterFormGroup.get("PlantList").value &&
             this.InvoiceFilterFormGroup.get("PlantList").value.length > 0
                 ? this.InvoiceFilterFormGroup.get("PlantList").value
-                : this.authenticationDetails.plant.split(",");
+                : this.authenticationDetails.plant ? this.authenticationDetails.plant.split(",") : [];
         isCustomer
             ? (filterPayload.UserCode = this.authenticationDetails.userCode)
             : (filterPayload.UserCode = null);
@@ -503,29 +505,29 @@ export class ReverseLogisticsComponent implements OnInit {
         el.click();
     }
 
-    handleFileInput(evt) {
-        if (evt.target.files && evt.target.files.length > 0) {
-            if (
-                Math.round(Number(evt.target.files[0].size) / (1024 * 1024)) <=
-                5
-            ) {
-                this.fileToUploadList = [];
-                this.fileToUploadList.push(evt.target.files[0]);
-                if (this.authenticationDetails.userRole == "Customer") {
-                    this.confirmByCustomer();
-                } else if (
-                    this.authenticationDetails.userRole == "Amararaja User"
-                ) {
-                    this.confirmByDC();
-                }
-            } else {
-                this.notificationSnackBarComponent.openSnackBar(
-                    "Please upload file size below 5 MB",
-                    SnackBarStatus.danger
-                );
-            }
-        }
-    }
+    // handleFileInput(evt) {
+    //     if (evt.target.files && evt.target.files.length > 0) {
+    //         if (
+    //             Math.round(Number(evt.target.files[0].size) / (1024 * 1024)) <=
+    //             5
+    //         ) {
+    //             this.fileToUploadList = [];
+    //             this.fileToUploadList.push(evt.target.files[0]);
+    //             if (this.authenticationDetails.userRole == "Customer") {
+    //                 this.confirmByCustomer();
+    //             } else if (
+    //                 this.authenticationDetails.userRole == "Amararaja User"
+    //             ) {
+    //                 // this.confirmByDC();
+    //             }
+    //         } else {
+    //             this.notificationSnackBarComponent.openSnackBar(
+    //                 "Please upload file size below 5 MB",
+    //                 SnackBarStatus.danger
+    //             );
+    //         }
+    //     }
+    // }
 
     confirmByCustomer() {
         const RpodDetailsFormArray = this.RpodDetailsFormGroup.get(
@@ -578,55 +580,55 @@ export class ReverseLogisticsComponent implements OnInit {
         }
     }
 
-    confirmByDC() {
-        const RpodDetailsFormArray = this.RpodDetailsFormGroup.get(
-            "RpodDetails"
-        ) as FormArray;
-        let selectedRowValue =
-            RpodDetailsFormArray.controls[this.selectedIndex].value;
-        if (
-            selectedRowValue["LR_DATE"] != null &&
-            selectedRowValue["LR_DATE"] != undefined &&
-            selectedRowValue["LR_NO"] &&
-            selectedRowValue["DC_RECEIEVED_DATE"] != null &&
-            selectedRowValue["DC_RECEIEVED_DATE"] != undefined
-        ) {
-            let payLoad = new ReversePodUpdation();
-            const RpodFormArray = this.RpodDetailsFormGroup.get(
-                "RpodDetails"
-            ) as FormArray;
-            payLoad = RpodFormArray.controls[this.selectedIndex].value;
-            payLoad.RPOD_HEADER_ID =
-                this.FilteredRpodDetails[this.selectedIndex].RPOD_HEADER_ID;
-            payLoad.DC_RECEIEVED_DATE = this._datePipe.transform(
-                payLoad.DC_RECEIEVED_DATE,
-                "yyyy-MM-dd HH:mm:ss"
-            );
-            payLoad.Status = 2;
+    // confirmByDC() {
+    //     const RpodDetailsFormArray = this.RpodDetailsFormGroup.get(
+    //         "RpodDetails"
+    //     ) as FormArray;
+    //     let selectedRowValue =
+    //         RpodDetailsFormArray.controls[this.selectedIndex].value;
+    //     if (
+    //         selectedRowValue["LR_DATE"] != null &&
+    //         selectedRowValue["LR_DATE"] != undefined &&
+    //         selectedRowValue["LR_NO"] &&
+    //         selectedRowValue["DC_RECEIEVED_DATE"] != null &&
+    //         selectedRowValue["DC_RECEIEVED_DATE"] != undefined
+    //     ) {
+    //         let payLoad = new ReversePodUpdation();
+    //         const RpodFormArray = this.RpodDetailsFormGroup.get(
+    //             "RpodDetails"
+    //         ) as FormArray;
+    //         payLoad = RpodFormArray.controls[this.selectedIndex].value;
+    //         payLoad.RPOD_HEADER_ID =
+    //             this.FilteredRpodDetails[this.selectedIndex].RPOD_HEADER_ID;
+    //         payLoad.DC_RECEIEVED_DATE = this._datePipe.transform(
+    //             payLoad.DC_RECEIEVED_DATE,
+    //             "yyyy-MM-dd HH:mm:ss"
+    //         );
+    //         payLoad.Status = 2;
 
-            const formData: FormData = new FormData();
-            formData.append("Payload", JSON.stringify(payLoad));
-            if (this.fileToUploadList && this.fileToUploadList.length) {
-                this.fileToUploadList.forEach((x) => {
-                    formData.append(x.name, x, x.name);
-                });
-                this.isProgressBarVisibile = true;
-                this._reversePod.ConfirmInvoiceItems(formData).subscribe({
-                    next: (data) => {
-                        this.filterAllReversePODs();
-                    },
-                    error: () => {
-                        this.isProgressBarVisibile = false;
-                    },
-                });
-            }
-        } else {
-            this.notificationSnackBarComponent.openSnackBar(
-                "Please fill valid data for LR Details and Received date.",
-                SnackBarStatus.danger
-            );
-        }
-    }
+    //         const formData: FormData = new FormData();
+    //         formData.append("Payload", JSON.stringify(payLoad));
+    //         if (this.fileToUploadList && this.fileToUploadList.length) {
+    //             this.fileToUploadList.forEach((x) => {
+    //                 formData.append(x.name, x, x.name);
+    //             });
+    //             this.isProgressBarVisibile = true;
+    //             this._reversePod.ConfirmInvoiceItems(formData).subscribe({
+    //                 next: (data) => {
+    //                     this.filterAllReversePODs();
+    //                 },
+    //                 error: () => {
+    //                     this.isProgressBarVisibile = false;
+    //                 },
+    //             });
+    //         }
+    //     } else {
+    //         this.notificationSnackBarComponent.openSnackBar(
+    //             "Please fill valid data for LR Details and Received date.",
+    //             SnackBarStatus.danger
+    //         );
+    //     }
+    // }
 
     doughnutChartClicked(e: any): void {
         if (e.active.length > 0) {
@@ -702,97 +704,97 @@ export class ReverseLogisticsComponent implements OnInit {
         el.click();
     }
 
-    handleFileInput1(evt) {
-        if (evt.target.files && evt.target.files.length > 0) {
-            if (
-                Math.round(Number(evt.target.files[0].size) / (1024 * 1024)) <=
-                5
-            ) {
-                this.fileToUploadList = [];
-                this.fileToUploadList.push(evt.target.files[0]);
-                const formData: FormData = new FormData();
-                formData.append(
-                    "HeaderID",
-                    this.dataSource.data[
-                        this.selectedIndex
-                    ].RPOD_HEADER_ID.toString()
-                );
-                if (this.fileToUploadList && this.fileToUploadList.length) {
-                    this.fileToUploadList.forEach((x) => {
-                        formData.append(x.name, x, x.name);
-                    });
-                }
-                this.isProgressBarVisibile = true;
-                this._reversePod.ReUploadReversePodLr(formData).subscribe({
-                    next: (res) => {
-                        this.notificationSnackBarComponent.openSnackBar(
-                            "LR copy updated successfully",
-                            SnackBarStatus.success
-                        );
-                    },
-                    error: (err) => {
-                        this.notificationSnackBarComponent.openSnackBar(
-                            err instanceof Object
-                                ? "Something went wrong"
-                                : err,
-                            SnackBarStatus.danger
-                        );
-                    },
-                });
-            } else {
-                this.notificationSnackBarComponent.openSnackBar(
-                    "Please upload file size below 5 MB",
-                    SnackBarStatus.danger
-                );
-            }
-        }
-    }
+    // handleFileInput1(evt) {
+    //     if (evt.target.files && evt.target.files.length > 0) {
+    //         if (
+    //             Math.round(Number(evt.target.files[0].size) / (1024 * 1024)) <=
+    //             5
+    //         ) {
+    //             this.fileToUploadList = [];
+    //             this.fileToUploadList.push(evt.target.files[0]);
+    //             const formData: FormData = new FormData();
+    //             formData.append(
+    //                 "HeaderID",
+    //                 this.dataSource.data[
+    //                     this.selectedIndex
+    //                 ].RPOD_HEADER_ID.toString()
+    //             );
+    //             if (this.fileToUploadList && this.fileToUploadList.length) {
+    //                 this.fileToUploadList.forEach((x) => {
+    //                     formData.append(x.name, x, x.name);
+    //                 });
+    //             }
+    //             this.isProgressBarVisibile = true;
+    //             this._reversePod.ReUploadReversePodLr(formData).subscribe({
+    //                 next: (res) => {
+    //                     this.notificationSnackBarComponent.openSnackBar(
+    //                         "LR copy updated successfully",
+    //                         SnackBarStatus.success
+    //                     );
+    //                 },
+    //                 error: (err) => {
+    //                     this.notificationSnackBarComponent.openSnackBar(
+    //                         err instanceof Object
+    //                             ? "Something went wrong"
+    //                             : err,
+    //                         SnackBarStatus.danger
+    //                     );
+    //                 },
+    //             });
+    //         } else {
+    //             this.notificationSnackBarComponent.openSnackBar(
+    //                 "Please upload file size below 5 MB",
+    //                 SnackBarStatus.danger
+    //             );
+    //         }
+    //     }
+    // }
 
-    ConfirmQty(ind: number) {
-        const RPODFORMARRAY = this.RpodDetailsFormGroup.get(
-            "RpodDetails"
-        ) as FormArray;
-        var payLoad = new ReversePodUpdation();
-        payLoad = RPODFORMARRAY.controls[ind].value;
-        payLoad.RPOD_HEADER_ID = this.FilteredRpodDetails[ind].RPOD_HEADER_ID;
-        payLoad.DC_RECEIEVED_DATE = this._datePipe.transform(
-            payLoad.DC_RECEIEVED_DATE,
-            "yyyy-MM-dd HH:mm:ss"
-        );
-        payLoad.Status = 2;
+    // ConfirmQty(ind: number) {
+    //     const RPODFORMARRAY = this.RpodDetailsFormGroup.get(
+    //         "RpodDetails"
+    //     ) as FormArray;
+    //     var payLoad = new ReversePodUpdation();
+    //     payLoad = RPODFORMARRAY.controls[ind].value;
+    //     payLoad.RPOD_HEADER_ID = this.FilteredRpodDetails[ind].RPOD_HEADER_ID;
+    //     payLoad.DC_RECEIEVED_DATE = this._datePipe.transform(
+    //         payLoad.DC_RECEIEVED_DATE,
+    //         "yyyy-MM-dd HH:mm:ss"
+    //     );
+    //     payLoad.Status = 2;
 
-        if (payLoad.RECEIVED_QUANTITY > payLoad.HAND_OVERED_QUANTITY) {
-            this.notificationSnackBarComponent.openSnackBar(
-                "Received quantity can not be greater than handovered quantity",
-                SnackBarStatus.danger
-            );
-        } else if (
-            payLoad.RECEIVED_QUANTITY > this.FilteredRpodDetails[ind].Quantity
-        ) {
-            this.notificationSnackBarComponent.openSnackBar(
-                "Received quantity can not be greater than actual quantity",
-                SnackBarStatus.danger
-            );
-        } else {
-            this._reversePod.ConfirmReversePodQty(payLoad).subscribe({
-                next: (res) => {
-                    if (res) {
-                        this.notificationSnackBarComponent.openSnackBar(
-                            "Quantity details updatd successfully.",
-                            SnackBarStatus.success
-                        );
-                        this.filterAllReversePODs();
-                    }
-                },
-                error: (err) => {
-                    this.notificationSnackBarComponent.openSnackBar(
-                        err instanceof Object ? "Something went wrong" : err,
-                        SnackBarStatus.danger
-                    );
-                },
-            });
-        }
-    }
+    //     if (payLoad.RECEIVED_QUANTITY > payLoad.HAND_OVERED_QUANTITY) {
+    //         this.notificationSnackBarComponent.openSnackBar(
+    //             "Received quantity can not be greater than handovered quantity",
+    //             SnackBarStatus.danger
+    //         );
+    //     } else if (
+    //         payLoad.RECEIVED_QUANTITY > this.FilteredRpodDetails[ind].Quantity
+    //     ) {
+    //         this.notificationSnackBarComponent.openSnackBar(
+    //             "Received quantity can not be greater than actual quantity",
+    //             SnackBarStatus.danger
+    //         );
+    //     } else {
+    //         this._reversePod.ConfirmReversePodQty(payLoad).subscribe({
+    //             next: (res) => {
+    //                 if (res) {
+    //                     this.notificationSnackBarComponent.openSnackBar(
+    //                         "Quantity details updatd successfully.",
+    //                         SnackBarStatus.success
+    //                     );
+    //                     this.filterAllReversePODs();
+    //                 }
+    //             },
+    //             error: (err) => {
+    //                 this.notificationSnackBarComponent.openSnackBar(
+    //                     err instanceof Object ? "Something went wrong" : err,
+    //                     SnackBarStatus.danger
+    //                 );
+    //             },
+    //         });
+    //     }
+    // }
 
     OpenAttachmentDialog(FileName: string, blob: Blob) {
         const attachmentDetails: AttachmentDetails = {
@@ -829,7 +831,7 @@ export class ReverseLogisticsComponent implements OnInit {
             this.InvoiceFilterFormGroup.get("PlantList").value &&
             this.InvoiceFilterFormGroup.get("PlantList").value.length > 0
                 ? this.InvoiceFilterFormGroup.get("PlantList").value
-                : this.authenticationDetails.plant.split(",");
+                : this.authenticationDetails.plant ? this.authenticationDetails.plant.split(",") : [];
 
         filterPayload.UserCode =
             this.InvoiceFilterFormGroup.get("UserCode").value;
@@ -868,5 +870,10 @@ export class ReverseLogisticsComponent implements OnInit {
 
     getFormGroupIndex(ind: number) {
         return this.pageIndex * this.pageSize + ind;
+    }
+
+    goToReverseLogisticsItem(revLogDetails:ReversePOD){
+        this._shareParameterService.setReverseLogisticDetail(revLogDetails);
+        this._router.navigate(["/pages/reverseLogisticsItem"]);
     }
 }

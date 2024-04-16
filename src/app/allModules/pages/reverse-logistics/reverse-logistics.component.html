@@ -164,35 +164,36 @@
                 <table class="table" mat-table [dataSource]="dataSource">
                     <ng-container matColumnDef="DC_Number">
                         <th mat-header-cell *matHeaderCellDef>DC Number</th>
-                        <td mat-cell *matCellDef="let element">
+                        <td mat-cell *matCellDef="let element; let index = index"
+                        (click)="goToReverseLogisticsItem(element)">
                             {{ element.DC_NUMBER }}
                         </td>
                     </ng-container>
 
                     <ng-container matColumnDef="DC_Date">
                         <th mat-header-cell *matHeaderCellDef>DC Date</th>
-                        <td mat-cell *matCellDef="let element">
+                        <td mat-cell *matCellDef="let element" (click)="goToReverseLogisticsItem(element)">
                             {{ element.DC_DATE | date : "dd/MM/yyyy" }}
                         </td>
                     </ng-container>
 
                     <ng-container matColumnDef="Claim_Type">
                         <th mat-header-cell *matHeaderCellDef>Claim Type</th>
-                        <td mat-cell *matCellDef="let element">
+                        <td mat-cell *matCellDef="let element" (click)="goToReverseLogisticsItem(element)">
                             {{ element.CLAIM_TYPE }}
                         </td>
                     </ng-container>
 
                     <ng-container matColumnDef="Customer_Code">
                         <th mat-header-cell *matHeaderCellDef>Customer Code</th>
-                        <td mat-cell *matCellDef="let element">
+                        <td mat-cell *matCellDef="let element" (click)="goToReverseLogisticsItem(element)">
                             {{ element.CUSTOMER }}
                         </td>
                     </ng-container>
 
                     <ng-container matColumnDef="Customer_Name">
                         <th mat-header-cell *matHeaderCellDef>Customer Name</th>
-                        <td mat-cell *matCellDef="let element">
+                        <td mat-cell *matCellDef="let element" (click)="goToReverseLogisticsItem(element)">
                             {{ element.CUSTOMER_NAME }}
                         </td>
                     </ng-container>
@@ -208,38 +209,31 @@
 
                     <ng-container matColumnDef="Plant_Name">
                         <th mat-header-cell *matHeaderCellDef>Plant Name</th>
-                        <td mat-cell *matCellDef="let element">
+                        <td mat-cell *matCellDef="let element" (click)="goToReverseLogisticsItem(element)">
                             {{ element.PLANT_NAME }}
                         </td>
                     </ng-container>
 
-                    <ng-container matColumnDef="Material_Code">
+                    <!-- <ng-container matColumnDef="Material_Code">
                         <th mat-header-cell *matHeaderCellDef>Material Code</th>
                         <td mat-cell *matCellDef="let element">
                             {{ element.MATERIAL_CODE }}
                         </td>
-                    </ng-container>
+                    </ng-container> -->
 
-                    <ng-container matColumnDef="Quantity">
+                    <!-- <ng-container matColumnDef="Quantity">
                         <th mat-header-cell *matHeaderCellDef>
                             Actual Quantity
                         </th>
                         <td mat-cell *matCellDef="let element">
                             {{ element.QUANTITY }}
                         </td>
-                    </ng-container>
+                    </ng-container> -->
 
-                    <ng-container matColumnDef="Customer_Delivery_Quantity">
+                    <!-- <ng-container matColumnDef="Customer_Delivery_Quantity">
                         <th mat-header-cell *matHeaderCellDef>
                             Customer Handovered Quantity
                         </th>
-                        <!-- <td mat-cell *matCellDef="let element; let index = index"
-                                [formGroupName]="getFormGroupIndex(index)">
-                                <mat-form-field appearance="outline">
-                                    <input matInput type="number" formControlName="HAND_OVERED_QUANTITY" />
-                                </mat-form-field>
-                               
-                            </td> -->
                         <td
                             mat-cell
                             *matCellDef="let element; let index = index"
@@ -255,7 +249,7 @@
                         <td mat-cell *matCellDef="let element">
                             {{ element.CUSTOMER_PENDING_QUANTITY }}
                         </td>
-                    </ng-container>
+                    </ng-container> -->
 
                     <!-- <ng-container matColumnDef="Handovered_Status">
                             <th mat-header-cell *matHeaderCellDef>
@@ -277,61 +271,17 @@
                         <td
                             mat-cell
                             *matCellDef="let element; let index = index"
-                        >
+                            (click)="goToReverseLogisticsItem(element)">
                             {{ element.LR_NO }}
                         </td>
                     </ng-container>
 
                     <ng-container matColumnDef="LR_Date">
                         <th mat-header-cell *matHeaderCellDef>LR Date</th>
-                        <!-- <td mat-cell *matCellDef="let element; let index = index"
-                            [formGroupName]="getFormGroupIndex(index)">
-                            <mat-form-field class="pl-8 pr-12" appearance="outline">
-                                <input matInput [matDatepicker]="pickerRpodLr" formControlName="LR_DATE" [min]="
-                                            RpodDetailsFormGroup.get(
-                                                'RpodDetails'
-                                            ).controls[index]?.get('LR_DATE')
-                                                ?.value
-                                                ? RpodDetailsFormGroup.get(
-                                                      'RpodDetails'
-                                                  ).controls[index]?.get(
-                                                      'LR_DATE'
-                                                  )?.value
-                                                : RpodDetailsFormGroup.get(
-                                                      'RpodDetails'
-                                                  ).controls[index]?.get(
-                                                      'LR_DATE'
-                                                  )?.value
-                                                ? RpodDetailsFormGroup.get(
-                                                      'RpodDetails'
-                                                  ).controls[index]?.get(
-                                                      'LR_DATE'
-                                                  )?.value
-                                                : minDate
-                                        " [max]="maxDate" (click)="pickerRpodLr.open()" />
-                                <mat-datepicker-toggle matSuffix [for]="pickerRpodLr">
-                                </mat-datepicker-toggle>
-                                <mat-datepicker #pickerRpodLr></mat-datepicker>
-                                <mat-error *ngIf="
-                                            RpodDetailsFormGroup.get(
-                                                'RpodDetails'
-                                            ).controls[index]?.get('LR_DATE')
-                                                .touched &&
-                                            RpodDetailsFormGroup.get(
-                                                'RpodDetails'
-                                            )
-                                                .controls[index]?.get('LR_DATE')
-                                                .hasError('required')
-                                        ">
-                                    *
-                                </mat-error>
-                            </mat-form-field>
-                        </td> -->
-
                         <td
                             mat-cell
                             *matCellDef="let element; let index = index"
-                        >
+                            (click)="goToReverseLogisticsItem(element)">
                             {{ element.LR_DATE | date : "dd-MM-yyyy" }}
                         </td>
                     </ng-container>
@@ -341,8 +291,7 @@
                         <td
                             mat-cell
                             *matCellDef="let element; let index = index"
-                            class="pl-12"
-                        >
+                            class="pl-12">
                             <div fxLayoutAlign="center center" class="pr-40">
                                 <mat-icon
                                     svgIcon="photoIcon"
@@ -361,18 +310,10 @@
                         </td>
                     </ng-container>
 
-                    <ng-container matColumnDef="DC_Received_Quantity">
+                    <!-- <ng-container matColumnDef="DC_Received_Quantity">
                         <th mat-header-cell *matHeaderCellDef>
                             DC Received Quantity
                         </th>
-
-                        <!-- <td mat-cell *matCellDef="let element; let index = index"
-                            [formGroupName]="getFormGroupIndex(index)">
-                            <mat-form-field appearance="outline">
-                                <input matInput type="number" formControlName="RECEIVED_QUANTITY"
-                                    [readonly]="authenticationDetails.userRole === 'Customer'" />
-                            </mat-form-field>
-                        </td> -->
 
                         <td
                             mat-cell
@@ -380,16 +321,16 @@
                         >
                             {{ element.RECEIVED_QUANTITY }}
                         </td>
-                    </ng-container>
+                    </ng-container> -->
 
-                    <ng-container matColumnDef="DC_Pending_Quantity">
+                    <!-- <ng-container matColumnDef="DC_Pending_Quantity">
                         <th mat-header-cell *matHeaderCellDef>
                             DC Pending Quantity
                         </th>
                         <td mat-cell *matCellDef="let element">
                             {{ element.DC_PENDING_QUANTITY }}
                         </td>
-                    </ng-container>
+                    </ng-container> -->
 
                     <ng-container matColumnDef="DC_Received_Date">
                         <th mat-header-cell *matHeaderCellDef>
@@ -442,7 +383,7 @@
                         <td
                             mat-cell
                             *matCellDef="let element; let index = index"
-                        >
+                            (click)="goToReverseLogisticsItem(element)">
                             {{
                                 element.DC_RECEIEVED_DATE | date : "dd-MM-yyyy"
                             }}
@@ -453,7 +394,7 @@
                         <th mat-header-cell *matHeaderCellDef>
                             Acknowledgement Date
                         </th>
-                        <td mat-cell *matCellDef="let element">
+                        <td mat-cell *matCellDef="let element" (click)="goToReverseLogisticsItem(element)">
                             {{
                                 element.DC_ACKNOWLEDGEMENT_DATE
                                     | date : "dd-MM-yyyy HH:mm a"
@@ -463,31 +404,20 @@
 
                     <ng-container matColumnDef="Received_Status">
                         <th mat-header-cell *matHeaderCellDef>Status</th>
-                        <td mat-cell *matCellDef="let element">
+                        <td mat-cell *matCellDef="let element" (click)="goToReverseLogisticsItem(element)">
                             {{ element.RECEIVED_STATUS }}
                         </td>
                     </ng-container>
 
-                    <ng-container matColumnDef="Remarks">
+                    <!-- <ng-container matColumnDef="Remarks">
                         <th mat-header-cell *matHeaderCellDef>Remarks</th>
-                        <!-- <td mat-cell *matCellDef="let elementlet; let index = index"
-                            [formGroupName]="getFormGroupIndex(index)">
-                            <mat-form-field appearance="outline">
-                                <input matInput type="text" formControlName="REMARKS" [matAutocomplete]="auto" />
-                                <mat-autocomplete #auto="matAutocomplete">
-                                    <mat-option *ngFor="let opt of remarkOptions" [value]="opt">
-                                        {{ opt }}
-                                    </mat-option>
-                                </mat-autocomplete>
-                            </mat-form-field>
-                        </td> -->
                         <td
                             mat-cell
                             *matCellDef="let element; let index = index"
                         >
                             {{ element.REMARKS }}
                         </td>
-                    </ng-container>
+                    </ng-container> -->
 
                     <ng-container matColumnDef="DCLR">
                         <th mat-header-cell *matHeaderCellDef>DC Attachment</th>
@@ -495,7 +425,7 @@
                             mat-cell
                             *matCellDef="let element; let index = index"
                             class="pl-12"
-                        >
+                            >
                             <div
                                 fxLayoutAlign="center center"
                                 fxLayoutGap="20px"
@@ -534,14 +464,14 @@
 
                     <ng-container matColumnDef="SLA_DATE">
                         <th mat-header-cell *matHeaderCellDef>Claim Creation Date</th>
-                        <td mat-cell *matCellDef="let element">
+                        <td mat-cell *matCellDef="let element" (click)="goToReverseLogisticsItem(element)">
                             {{ element.SLA_DATE | date : "dd/MM/yyyy" }}
                         </td>
                     </ng-container>
 
                     <ng-container matColumnDef="PENDING_DAYS">
                         <th mat-header-cell *matHeaderCellDef>Pending Days</th>
-                        <td mat-cell *matCellDef="let element">
+                        <td mat-cell *matCellDef="let element" (click)="goToReverseLogisticsItem(element)">
                             {{ element.PENDING_DAYS }}
                         </td>
                     </ng-container>
@@ -579,6 +509,7 @@
                     <tr
                         mat-row
                         *matRowDef="let row; columns: displayedColumns"
+                        style="cursor: pointer !important"
                     ></tr>
                 </table>
                 <div *ngIf="!FilteredRpodDetails?.length">

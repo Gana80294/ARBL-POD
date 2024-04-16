@@ -187,4 +187,11 @@ export class ReversePodService {
             )
             .pipe(catchError(this.errorHandler));
     }
+
+    confirmReversePod(formData: FormData): Observable<any> {
+        return this._httpClient.post<any>(
+            `${this.baseAddress}api/ReversePOD/ConfirmReversePod`, formData
+        )
+            .pipe(catchError(this.errorHandler));
+    }
 }

@@ -66,6 +66,7 @@ import { SearchableSelectModule } from 'app/CustomControls/searchable-multi-sele
 import { ReverseLogisticsComponent } from './reverse-logistics/reverse-logistics.component';
 import { DeliveryChallansComponent } from './delivery-challans/delivery-challans.component';
 import { HomeComponent } from './home/home.component';
+import { ReverseLogisticsItemComponent } from './reverse-logistics-item/reverse-logistics-item.component';
 const routes = [
     {
         path: 'forwardLogistics',
@@ -98,6 +99,10 @@ const routes = [
     {
         path: 'home',
         component: HomeComponent
+    },
+    {
+        path:'reverseLogisticsItem',
+        component:ReverseLogisticsItemComponent
     },
     // {
     //     path     : 'courses',
@@ -178,7 +183,7 @@ const routes = [
         FormsModule
     ],
     declarations: [DashboardComponent, InvoiceItemComponent, InvoiceDetailsComponent,
-        SavedInvoiceComponent, PartiallyConfirmedInvoiceComponent, ReverseLogisticsComponent, DeliveryChallansComponent, HomeComponent],
+        SavedInvoiceComponent, PartiallyConfirmedInvoiceComponent, ReverseLogisticsComponent, DeliveryChallansComponent, HomeComponent, ReverseLogisticsItemComponent],
     providers: [
         DecimalPipe
     ],

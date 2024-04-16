@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { FilterClass, InvoiceDetails, ReportInvoice } from 'app/models/invoice-details';
+import { FilterClass, InvoiceDetails, ReportInvoice, ReversePOD } from 'app/models/invoice-details';
 
 @Injectable({
   providedIn: 'root'
@@ -12,6 +12,7 @@ export class ShareParameterService {
   public CurrentReportFilterClass: FilterClass = new FilterClass();
   public CurrentSavedInvoiceFilterClass: FilterClass = new FilterClass();
   public CurrentPartialInvoiceFilterClass: FilterClass = new FilterClass();
+  public currentReverseLogisticDetail : ReversePOD;
   constructor() { }
   SetReportInvoiceDetail(InvoiceDetail: ReportInvoice): void {
     this.CurrentReportInvoiceDetail = InvoiceDetail;
@@ -58,5 +59,13 @@ export class ShareParameterService {
     // console.log(this.CurrentPartialInvoiceFilterClass);
     
     return this.CurrentPartialInvoiceFilterClass;
+  }
+
+  setReverseLogisticDetail(reverseLogisticDetail:ReversePOD):void{
+    this.currentReverseLogisticDetail = reverseLogisticDetail;
+  }
+
+  getReverseLogisticDetail():ReversePOD{
+    return this.currentReverseLogisticDetail;
   }
 }

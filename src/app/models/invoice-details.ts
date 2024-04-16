@@ -265,17 +265,9 @@ export class ReversePOD {
     CUSTOMER_NAME: string;
     PLANT: string;
     PLANT_NAME: string;
-    MATERIAL_CODE: string;
-    QUANTITY: number;
-    HAND_OVERED_QUANTITY: number;
-    CUSTOMER_PENDING_QUANTITY: number = 0;
-    HANDOVERED_STATUS: string;
     LR_NO: string;
     LR_DATE: Date;
-    RECEIVED_QUANTITY: number;
-    DC_PENDING_QUANTITY: number = 0;
-    RECEIVED_STATUS: string;
-    REMARKS: string;
+    STATUS: string;
     CUSTOMER_ATTACHMENT_ID: number;
     CUSTOMER_LR_DOC_NAME: string;
     DC_ATTACHMENT_ID: number;
@@ -284,6 +276,19 @@ export class ReversePOD {
     DC_ACKNOWLEDGEMENT_DATE: Date | string | null;
     SLA_DATE: Date | string | null;
     PENDING_DAYS: number;
+}
+
+export class ReversePodMaterialDetail {
+    MATERIAL_ID: number;
+    RPOD_HEADER_ID: number;
+    MATERIAL_CODE: string;
+    QUANTITY: number;
+    HAND_OVERED_QUANTITY: number;
+    CUSTOMER_PENDING_QUANTITY: number;
+    RECEIVED_QUANTITY: number;
+    DC_PENDING_QUANTITY: number;
+    STATUS: string;
+    REMARKS: string;
 }
 
 export class ReversePODFilter {
@@ -304,10 +309,19 @@ export class ReversePodUpdation {
     LR_DATE: Date | string | null;
     RPOD_HEADER_ID: number;
     Status: number;
+    DC_RECEIEVED_DATE: Date | string | null;
+    DC_ACKNOWLEDGEMENT_DATE: Date | null;
+    STATUS: string;
+    MATERIALS: ReversePodItemUpdation[];
+}
+
+export class ReversePodItemUpdation {
+    MATERIAL_ID: number;
+    MATERIAL_CODE: string;
     HAND_OVERED_QUANTITY: number;
     RECEIVED_QUANTITY: number;
     REMARKS: string;
-    DC_RECEIEVED_DATE: Date | string | null;
+    STATUS: string;
 }
 
 export class ReversePodApprover {

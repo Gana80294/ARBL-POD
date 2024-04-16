@@ -18,6 +18,7 @@ import {
     FilterClass,
     ReversePOD,
     ReversePODFilter,
+    ReversePodMaterialDetail,
 } from "app/models/invoice-details";
 
 @Injectable({
@@ -615,6 +616,14 @@ export class DashboardService {
         return this._httpClient
             .get<any>(
                 `${this.baseAddress}api/ReversePOD/GetAllReversePODByCustomer?customerCode=${UserCode}`
+            )
+            .pipe(catchError(this.errorHandler));
+    }
+
+    getReversePodMaterialDetails(headerID:number):Observable<any>{
+        return this._httpClient
+            .get<any>(
+                `${this.baseAddress}api/ReversePOD/GetReverseMaterialDetails?HeaderId=${headerID}`
             )
             .pipe(catchError(this.errorHandler));
     }

@@ -22,6 +22,7 @@ import {
     ReversePODFilter,
     ReversePodUpdation,
     AttachmentDetails,
+    ReversePodItemUpdation,
 } from "app/models/invoice-details";
 import { AuthenticationDetails, Plant, PlantGroup } from "app/models/master";
 import { NotificationSnackBarComponent } from "app/notifications/notification-snack-bar/notification-snack-bar.component";
@@ -32,6 +33,7 @@ import { ChartType } from "chart.js";
 import { Guid } from "guid-typescript";
 import { saveAs } from "file-saver";
 import { MasterService } from "app/services/master.service";
+import { ShareParameterService } from "app/services/share-parameters.service";
 
 @Component({
     selector: "app-delivery-challans",
@@ -95,26 +97,16 @@ export class DeliveryChallansComponent implements OnInit {
         "SLA_DATE",
         "DC_Date",
         "Claim_Type",
-        "Customer_Code",
         "Customer_Name",
-        "Plant_Code",
         "Plant_Name",
-        "Material_Code",
-        "Quantity",
-        "Customer_Delivery_Quantity",
-        "Customer_Pending_Quantity",
-        // "Handovered_Status",
         "LR_Number",
         "LR_Date",
         "CustomerLR",
-        "DC_Received_Quantity",
-        "DC_Pending_Quantity",
         "DC_Received_Date",
         "DC_Acknowledgement_Date",
-        "Received_Status",
+        "Status",
         "DCLR",
         "PENDING_DAYS",
-        "Remarks",
         "Action",
     ];
     dataSource = new MatTableDataSource<ReversePOD>();
@@ -158,7 +150,8 @@ export class DeliveryChallansComponent implements OnInit {
         public _reversePod: ReversePodService,
         private _datePipe: DatePipe,
         private dialog: MatDialog,
-        private _masterService: MasterService
+        private _masterService: MasterService,
+        private _shareParameterService: ShareParameterService,
     ) {
         this.notificationSnackBarComponent = new NotificationSnackBarComponent(
             this.snackBar
@@ -171,10 +164,10 @@ export class DeliveryChallansComponent implements OnInit {
             Status: [["Open"], Validators.required],
             StartDate: [startDate],
             EndDate: [new Date()],
-            PlantList: [],
+            PlantList: [[]],
             CustomerName: [null],
             UserCode: [null],
-            PlantGroupList: [],
+            PlantGroupList: [[]],
         });
 
         this.currentCustomPage = 1;
@@ -215,33 +208,33 @@ export class DeliveryChallansComponent implements OnInit {
         });
     }
 
-    ValueChangeEvents(category: string, index: number) {
-        const formArray = this.RpodDetailsFormGroup.get(
-            "RpodDetails"
-        ) as FormArray;
+    // ValueChangeEvents(category: string, index: number) {
+    //     const formArray = this.RpodDetailsFormGroup.get(
+    //         "RpodDetails"
+    //     ) as FormArray;
 
-        if (category === "Customer") {
-            this.dataSource.data[
-                this.getFormGroupIndex(index)
-            ].CUSTOMER_PENDING_QUANTITY =
-                this.dataSource.data[this.getFormGroupIndex(index)].QUANTITY -
-                formArray.controls[this.getFormGroupIndex(index)].get(
-                    "HAND_OVERED_QUANTITY"
-                ).value;
-        }
-        if (category === "DC") {
-            this.dataSource.data[
-                this.getFormGroupIndex(index)
-            ].DC_PENDING_QUANTITY =
-                formArray.controls[this.getFormGroupIndex(index)].get(
-                    "HAND_OVERED_QUANTITY"
-                ).value -
-                formArray.controls[this.getFormGroupIndex(index)].get(
-                    "RECEIEVED_QUANTITY"
-                ).value;
-        }
-        this.dataSource._updateChangeSubscription();
-    }
+    //     if (category === "Customer") {
+    //         this.dataSource.data[
+    //             this.getFormGroupIndex(index)
+    //         ].CUSTOMER_PENDING_QUANTITY =
+    //             this.dataSource.data[this.getFormGroupIndex(index)].QUANTITY -
+    //             formArray.controls[this.getFormGroupIndex(index)].get(
+    //                 "HAND_OVERED_QUANTITY"
+    //             ).value;
+    //     }
+    //     if (category === "DC") {
+    //         this.dataSource.data[
+    //             this.getFormGroupIndex(index)
+    //         ].DC_PENDING_QUANTITY =
+    //             formArray.controls[this.getFormGroupIndex(index)].get(
+    //                 "HAND_OVERED_QUANTITY"
+    //             ).value -
+    //             formArray.controls[this.getFormGroupIndex(index)].get(
+    //                 "RECEIEVED_QUANTITY"
+    //             ).value;
+    //     }
+    //     this.dataSource._updateChangeSubscription();
+    // }
 
     GetAllPlants(): void {
         this._masterService.GetAllPlantsByUserID(this.currentUserID).subscribe(
@@ -271,7 +264,7 @@ export class DeliveryChallansComponent implements OnInit {
                         this.isApprover = res.IsApprover;
                     }
                 },
-                error: (err) => {},
+                error: (err) => { },
             });
     }
 
@@ -300,9 +293,9 @@ export class DeliveryChallansComponent implements OnInit {
         console.log(this.InvoiceFilterFormGroup.get("PlantList").value);
         filterPayload.PlantList =
             this.InvoiceFilterFormGroup.get("PlantList").value &&
-            this.InvoiceFilterFormGroup.get("PlantList").value.length > 0
+                this.InvoiceFilterFormGroup.get("PlantList").value.length > 0
                 ? this.InvoiceFilterFormGroup.get("PlantList").value
-                : this.authenticationDetails.plant.split(",");
+                : this.authenticationDetails.plant ? this.authenticationDetails.plant.split(",") : [];
 
         filterPayload.UserCode =
             this.InvoiceFilterFormGroup.get("UserCode").value;
@@ -362,9 +355,9 @@ export class DeliveryChallansComponent implements OnInit {
 
         filterPayload.PlantList =
             this.InvoiceFilterFormGroup.get("PlantList").value &&
-            this.InvoiceFilterFormGroup.get("PlantList").value.length > 0
+                this.InvoiceFilterFormGroup.get("PlantList").value.length > 0
                 ? this.InvoiceFilterFormGroup.get("PlantList").value
-                : this.authenticationDetails.plant.split(",");
+                : this.authenticationDetails.plant ? this.authenticationDetails.plant.split(",") : [];
 
         this._reversePod.FilterAllOpenReversePODs(filterPayload).subscribe({
             next: (res) => {
@@ -400,9 +393,9 @@ export class DeliveryChallansComponent implements OnInit {
         );
         filterPayload.PlantList =
             this.InvoiceFilterFormGroup.get("PlantList").value &&
-            this.InvoiceFilterFormGroup.get("PlantList").value.length > 0
+                this.InvoiceFilterFormGroup.get("PlantList").value.length > 0
                 ? this.InvoiceFilterFormGroup.get("PlantList").value
-                : this.authenticationDetails.plant.split(",");
+                : this.authenticationDetails.plant ? this.authenticationDetails.plant.split(",") : [];
 
         isCustomer
             ? (filterPayload.UserCode = this.authenticationDetails.userCode)
@@ -448,9 +441,9 @@ export class DeliveryChallansComponent implements OnInit {
 
         filterPayload.PlantList =
             this.InvoiceFilterFormGroup.get("PlantList").value &&
-            this.InvoiceFilterFormGroup.get("PlantList").value.length > 0
+                this.InvoiceFilterFormGroup.get("PlantList").value.length > 0
                 ? this.InvoiceFilterFormGroup.get("PlantList").value
-                : this.authenticationDetails.plant.split(",");
+                : this.authenticationDetails.plant ? this.authenticationDetails.plant.split(",") : [];
 
         this._reversePod
             .FilterAllPartiallyConfirmedReversePODs(filterPayload)
@@ -488,9 +481,9 @@ export class DeliveryChallansComponent implements OnInit {
         );
         filterPayload.PlantList =
             this.InvoiceFilterFormGroup.get("PlantList").value &&
-            this.InvoiceFilterFormGroup.get("PlantList").value.length > 0
+                this.InvoiceFilterFormGroup.get("PlantList").value.length > 0
                 ? this.InvoiceFilterFormGroup.get("PlantList").value
-                : this.authenticationDetails.plant.split(",");
+                : this.authenticationDetails.plant ? this.authenticationDetails.plant.split(",") : [];
         isCustomer
             ? (filterPayload.UserCode = this.authenticationDetails.userCode)
             : (filterPayload.UserCode = null);
@@ -541,16 +534,16 @@ export class DeliveryChallansComponent implements OnInit {
         if (this.FilteredRpodDetails) {
             data = [
                 this.FilteredRpodDetails.filter(
-                    (x) => x.RECEIVED_STATUS == "Open"
+                    (x) => x.STATUS == "Open"
                 ).length,
                 this.FilteredRpodDetails.filter(
-                    (x) => x.RECEIVED_STATUS == "In Transit"
+                    (x) => x.STATUS == "In Transit"
                 ).length,
                 this.FilteredRpodDetails.filter(
-                    (x) => x.RECEIVED_STATUS == "Partially Confirmed"
+                    (x) => x.STATUS == "Partially Confirmed"
                 ).length,
                 this.FilteredRpodDetails.filter(
-                    (x) => x.RECEIVED_STATUS == "Confirmed"
+                    (x) => x.STATUS == "Confirmed"
                 ).length,
             ];
         }
@@ -558,10 +551,79 @@ export class DeliveryChallansComponent implements OnInit {
         this.doughnutChartData = data;
     }
 
-    ConfirmReversePod(ind) {
-        this.selectedIndex = ind;
-        const el: HTMLElement = this.fileInput.nativeElement;
-        el.click();
+    confirmReversePod(ind) {
+        const RPODFORMARRAY = this.RpodDetailsFormGroup.get("RpodDetails") as FormArray;
+        const LRNO = RPODFORMARRAY.controls[ind].get('LR_NO').value;
+        const LRDATE = RPODFORMARRAY.controls[ind].get('LR_DATE').value;
+        const DCRECEDATE = RPODFORMARRAY.controls[ind].get('DC_RECEIEVED_DATE').value;
+
+        if (LRNO && LRDATE && (this.currentUserRole !== 'Customer' ? DCRECEDATE : true)) {
+            this.selectedIndex = ind;
+            const el: HTMLElement = this.fileInput.nativeElement;
+            el.click();
+
+            const FORMDATA = new FormData();
+
+
+
+        } else {
+            let msg = this.currentUserRole == 'Customer' ?
+                'Please fill LR No & LR Date' : 'Please fill LR No, LR Date and DC Received Date';
+            this.notificationSnackBarComponent.openSnackBar(
+                msg,
+                SnackBarStatus.danger
+            );
+        }
+    }
+    confirmRpod() {
+        const RpodDetailsFormArray = this.RpodDetailsFormGroup.get(
+            "RpodDetails"
+        ) as FormArray;
+        let selectedRowValue =
+            RpodDetailsFormArray.controls[this.selectedIndex].value;
+
+        let payLoad = new ReversePodUpdation();
+        const RpodFormArray = this.RpodDetailsFormGroup.get(
+            "RpodDetails"
+        ) as FormArray;
+        payLoad = RpodFormArray.controls[this.selectedIndex].value;
+        payLoad.RPOD_HEADER_ID =
+            this.FilteredRpodDetails[this.selectedIndex].RPOD_HEADER_ID;
+        payLoad.LR_DATE = this._datePipe.transform(
+            payLoad.LR_DATE,
+            "yyyy-MM-dd HH:mm:ss"
+        );
+        payLoad.DC_RECEIEVED_DATE = this._datePipe.transform(
+            payLoad.DC_RECEIEVED_DATE,
+            "yyyy-MM-dd HH:mm:ss"
+        );
+        payLoad.Status = this.currentUserRole == 'Customer' ? 1 : 2;
+        payLoad.DC_ACKNOWLEDGEMENT_DATE =
+            this.FilteredRpodDetails[this.selectedIndex].DC_ACKNOWLEDGEMENT_DATE;
+        payLoad.STATUS =
+            this.FilteredRpodDetails[this.selectedIndex].STATUS;
+
+        
+
+        console.log(payLoad);
+
+        const FORMDATA: FormData = new FormData();
+
+        if (this.fileToUploadList && this.fileToUploadList.length) {
+            this.fileToUploadList.forEach((x) => {
+                FORMDATA.append(x.name, x, x.name);
+            });
+            FORMDATA.append("Payload", JSON.stringify(payLoad));
+        }
+        this.isProgressBarVisibile = true;
+        this._reversePod.confirmReversePod(FORMDATA).subscribe({
+            next: (res) => {
+
+            },
+            error: (err) => {
+
+            }
+        });
     }
 
     handleFileInput(evt) {
@@ -572,6 +634,7 @@ export class DeliveryChallansComponent implements OnInit {
             ) {
                 this.fileToUploadList = [];
                 this.fileToUploadList.push(evt.target.files[0]);
+                this.confirmRpod();
                 if (this.authenticationDetails.userRole == "Customer") {
                     this.confirmByCustomer();
                 } else if (
@@ -590,19 +653,22 @@ export class DeliveryChallansComponent implements OnInit {
 
     InsertRpodDetailsFormGroup(asnItem: ReversePOD, ind: number): void {
         const row = this._formBuilder.group({
-            HAND_OVERED_QUANTITY: [asnItem.HAND_OVERED_QUANTITY],
-            RECEIVED_QUANTITY: [asnItem.RECEIVED_QUANTITY],
+            // HAND_OVERED_QUANTITY: [asnItem.HAND_OVERED_QUANTITY],
+            // RECEIVED_QUANTITY: [asnItem.RECEIVED_QUANTITY],
             LR_DATE: [asnItem.LR_DATE],
             LR_NO: [asnItem.LR_NO],
-            REMARKS: [asnItem.REMARKS],
+            // REMARKS: [asnItem.REMARKS],
             DC_RECEIEVED_DATE: [asnItem.DC_RECEIEVED_DATE],
         });
+        if (this.currentUserRole == 'Customer') {
+            row.get('DC_RECEIEVED_DATE').disable();
+        }
 
-        this.dataSource.data[ind].CUSTOMER_PENDING_QUANTITY =
-            this.dataSource.data[ind].QUANTITY - asnItem.HAND_OVERED_QUANTITY;
+        // this.dataSource.data[ind].CUSTOMER_PENDING_QUANTITY =
+        //     this.dataSource.data[ind].QUANTITY - asnItem.HAND_OVERED_QUANTITY;
 
-        this.dataSource.data[ind].DC_PENDING_QUANTITY =
-            asnItem.HAND_OVERED_QUANTITY - asnItem.RECEIVED_QUANTITY;
+        // this.dataSource.data[ind].DC_PENDING_QUANTITY =
+        //     asnItem.HAND_OVERED_QUANTITY - asnItem.RECEIVED_QUANTITY;
 
         this.dataSource._updateChangeSubscription();
         this.RpodDetailsFormArray.push(row);
@@ -771,14 +837,14 @@ export class DeliveryChallansComponent implements OnInit {
                     fileType = fileName.toLowerCase().includes(".jpg")
                         ? "image/jpg"
                         : fileName.toLowerCase().includes(".jpeg")
-                        ? "image/jpeg"
-                        : fileName.toLowerCase().includes(".png")
-                        ? "image/png"
-                        : fileName.toLowerCase().includes(".gif")
-                        ? "image/gif"
-                        : fileName.toLowerCase().includes(".pdf")
-                        ? "application/pdf"
-                        : "";
+                            ? "image/jpeg"
+                            : fileName.toLowerCase().includes(".png")
+                                ? "image/png"
+                                : fileName.toLowerCase().includes(".gif")
+                                    ? "image/gif"
+                                    : fileName.toLowerCase().includes(".pdf")
+                                        ? "application/pdf"
+                                        : "";
                     // console.log(fileName)
                     const blob = new Blob([data], { type: fileType });
                     this.OpenAttachmentDialog(fileName, blob);
@@ -852,37 +918,37 @@ export class DeliveryChallansComponent implements OnInit {
         );
         payLoad.Status = 2;
 
-        if (payLoad.RECEIVED_QUANTITY > payLoad.HAND_OVERED_QUANTITY) {
-            this.notificationSnackBarComponent.openSnackBar(
-                "Received quantity can not be greater than handovered quantity",
-                SnackBarStatus.danger
-            );
-        } else if (
-            payLoad.RECEIVED_QUANTITY > this.FilteredRpodDetails[ind].Quantity
-        ) {
-            this.notificationSnackBarComponent.openSnackBar(
-                "Received quantity can not be greater than actual quantity",
-                SnackBarStatus.danger
-            );
-        } else {
-            this._reversePod.ConfirmReversePodQty(payLoad).subscribe({
-                next: (res) => {
-                    if (res) {
-                        this.notificationSnackBarComponent.openSnackBar(
-                            "Quantity details updatd successfully.",
-                            SnackBarStatus.success
-                        );
-                        this.filterAllReversePODs();
-                    }
-                },
-                error: (err) => {
-                    this.notificationSnackBarComponent.openSnackBar(
-                        err instanceof Object ? "Something went wrong" : err,
-                        SnackBarStatus.danger
-                    );
-                },
-            });
-        }
+        // if (payLoad.RECEIVED_QUANTITY > payLoad.HAND_OVERED_QUANTITY) {
+        //     this.notificationSnackBarComponent.openSnackBar(
+        //         "Received quantity can not be greater than handovered quantity",
+        //         SnackBarStatus.danger
+        //     );
+        // } else if (
+        //     payLoad.RECEIVED_QUANTITY > this.FilteredRpodDetails[ind].Quantity
+        // ) {
+        //     this.notificationSnackBarComponent.openSnackBar(
+        //         "Received quantity can not be greater than actual quantity",
+        //         SnackBarStatus.danger
+        //     );
+        // } else {
+        //     this._reversePod.ConfirmReversePodQty(payLoad).subscribe({
+        //         next: (res) => {
+        //             if (res) {
+        //                 this.notificationSnackBarComponent.openSnackBar(
+        //                     "Quantity details updatd successfully.",
+        //                     SnackBarStatus.success
+        //                 );
+        //                 this.filterAllReversePODs();
+        //             }
+        //         },
+        //         error: (err) => {
+        //             this.notificationSnackBarComponent.openSnackBar(
+        //                 err instanceof Object ? "Something went wrong" : err,
+        //                 SnackBarStatus.danger
+        //             );
+        //         },
+        //     });
+        // }
     }
 
     OpenAttachmentDialog(FileName: string, blob: Blob) {
@@ -918,9 +984,9 @@ export class DeliveryChallansComponent implements OnInit {
         );
         filterPayload.PlantList =
             this.InvoiceFilterFormGroup.get("PlantList").value &&
-            this.InvoiceFilterFormGroup.get("PlantList").value.length > 0
+                this.InvoiceFilterFormGroup.get("PlantList").value.length > 0
                 ? this.InvoiceFilterFormGroup.get("PlantList").value
-                : this.authenticationDetails.plant.split(",");
+                : this.authenticationDetails.plant ? this.authenticationDetails.plant.split(",") : [];
 
         filterPayload.UserCode =
             this.InvoiceFilterFormGroup.get("UserCode").value;
@@ -959,5 +1025,30 @@ export class DeliveryChallansComponent implements OnInit {
 
     getFormGroupIndex(ind: number) {
         return this.pageIndex * this.pageSize + ind;
+    }
+
+    goToReverseLogisticsItem(revLogDetails: ReversePOD) {
+        this._shareParameterService.setReverseLogisticDetail(revLogDetails);
+        this._router.navigate(["/pages/reverseLogisticsItem"]);
+    }
+
+    c(ind) {
+        const RPODFORMARRAY = this.RpodDetailsFormGroup.get("RpodDetails") as FormArray;
+        const LRNO = RPODFORMARRAY.controls[ind].get('LR_NO').value;
+        const LRDATE = RPODFORMARRAY.controls[ind].get('LR_DATE').value;
+        const DCRECEDATE = RPODFORMARRAY.controls[ind].get('DC_RECEIEVED_DATE').value;
+
+        if (LRNO && LRDATE && (this.currentUserRole !== 'Customer' ? DCRECEDATE : true)) {
+            this.selectedIndex = ind;
+            const el: HTMLElement = this.fileInput.nativeElement;
+            el.click();
+        } else {
+            let msg = this.currentUserRole == 'Customer' ?
+                'Please fill LR No & LR Date' : 'Please fill LR No, LR Date and DC Received Date';
+            this.notificationSnackBarComponent.openSnackBar(
+                msg,
+                SnackBarStatus.danger
+            );
+        }
     }
 }
