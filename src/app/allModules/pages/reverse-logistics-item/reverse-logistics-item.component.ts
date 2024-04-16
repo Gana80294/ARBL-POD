@@ -5,7 +5,7 @@ import { element } from '@angular/core/src/render3/instructions';
 import { FormGroup, FormArray, AbstractControl, FormBuilder, Validators, FormControl } from '@angular/forms';
 import { MatDialog, MatDialogConfig, MatPaginator, MatSnackBar, MatSort, MatTableDataSource } from '@angular/material';
 import { Router } from '@angular/router';
-import { AttachmentStatus, InvoiceDetails, InvoiceItemDetails, InvoiceUpdation, LRWithVehicleUnloaded, ReversePOD, ReversePodMaterialDetail } from 'app/models/invoice-details';
+import { AttachmentStatus, InvoiceDetails, InvoiceItemDetails, InvoiceUpdation, LRWithVehicleUnloaded, ReversePOD, ReversePodItemUpdation, ReversePodMaterialDetail, ReversePodUpdation } from 'app/models/invoice-details';
 import { AuthenticationDetails, Reason, ChangesDetected, UserActionHistory, Itemchanges } from 'app/models/master';
 import { NotificationDialogComponent } from 'app/notifications/notification-dialog/notification-dialog.component';
 import { NotificationSnackBarComponent } from 'app/notifications/notification-snack-bar/notification-snack-bar.component';
@@ -27,7 +27,6 @@ import { forkJoin } from 'rxjs';
 export class ReverseLogisticsItemComponent implements OnInit {
   selectedReverseLogisticDetail: ReversePOD;
   reverseLogisticsItemFormGroup: FormGroup;
-  rPODItemFormGroup: FormGroup;
   authenticationDetails: AuthenticationDetails;
   currentUserID: Guid;
   currentUserName: string;
@@ -59,7 +58,7 @@ export class ReverseLogisticsItemComponent implements OnInit {
   InvoiceItemDetailsDataSource = new MatTableDataSource<InvoiceItemDetails>();
   @ViewChild(MatPaginator) InvoiceItemDetailsPaginator: MatPaginator;
   @ViewChild(MatSort) InvoiceItemDetailsSort: MatSort;
-  @ViewChild("fileInput") fileInput: ElementRef<HTMLElement>;
+  @ViewChild("reversePodFileInput") fileInput: ElementRef<HTMLElement>;
   @ViewChild("fileInput1") fileInput1: ElementRef<HTMLElement>;
   fileToUpload: File;
   fileToUploadList: File[] = [];
@@ -98,7 +97,7 @@ export class ReverseLogisticsItemComponent implements OnInit {
     private _datePipe: DatePipe,
     private _decimalPipe: DecimalPipe,
     private renderer: Renderer,
-    private _reversePodService:ReversePodService
+    private _reversePodService: ReversePodService
   ) {
 
     // if (
@@ -1317,8 +1316,8 @@ export class ReverseLogisticsItemComponent implements OnInit {
 
   confirmReversePOD() {
     if (this.reverseLogisticsItemFormGroup.valid && this.isValidForm()) {
-      this.dataSource.data.some(x => x.STATUS.toLowerCase().includes('partially confirmed')) ?
-        alert('PC') : alert('C');
+      const el: HTMLElement = this.fileInput.nativeElement;
+      el.click();
     }
     else {
       this.ShowValidationErrors(this.reverseLogisticsItemFormGroup);
@@ -1387,6 +1386,70 @@ export class ReverseLogisticsItemComponent implements OnInit {
       }
     });
   }
+  confirmRpod() {
+
+    let payLoad = new ReversePodUpdation();
+  
+    payLoad.RPOD_HEADER_ID =
+      this.selectedReverseLogisticDetail.RPOD_HEADER_ID;
+      payLoad.LR_NO = this.reverseLogisticsItemFormGroup.value['LR_NO'];
+      payLoad.LR_DATE = this.reverseLogisticsItemFormGroup.value['LR_DATE'];
+      payLoad.DC_RECEIEVED_DATE  = this.reverseLogisticsItemFormGroup.get('DC_RECEIEVED_DATE').value;
+    payLoad.LR_DATE = this._datePipe.transform(
+      payLoad.LR_DATE,
+      "yyyy-MM-dd HH:mm:ss"
+    );
+    payLoad.DC_RECEIEVED_DATE = this._datePipe.transform(
+      payLoad.DC_RECEIEVED_DATE,
+      "yyyy-MM-dd HH:mm:ss"
+    );
+    payLoad.Status = this.currentUserRole == 'Customer' ? 1 : 2;
+    payLoad.DC_ACKNOWLEDGEMENT_DATE = this.selectedReverseLogisticDetail.DC_ACKNOWLEDGEMENT_DATE;
+    payLoad.STATUS =
+      this.selectedReverseLogisticDetail.STATUS;
+    payLoad.STATUS = this.currentUserRole == 'Customer' ? 'In Transit' :
+      this.dataSource.data.some(x => x.STATUS.toLowerCase().includes('partially confirmed')) ?
+        'Partially Confirmed' : 'Confirmed';
+
+    const RPODFORMARRAY = this.reverseLogisticsItemFormGroup.get(
+      "RPodItemArray"
+    ) as FormArray;
+    payLoad.MATERIALS = [];
+    this.dataSource.data.forEach((element, i) => {
+      let rpodItem = new ReversePodItemUpdation();
+      rpodItem = RPODFORMARRAY.controls[i].value;
+      rpodItem.RECEIVED_QUANTITY = RPODFORMARRAY.controls[i].get('RECEIVED_QUANTITY').value;
+      rpodItem.REMARKS = RPODFORMARRAY.controls[i].get('REMARKS').value;
+      rpodItem.MATERIAL_CODE = element.MATERIAL_CODE;
+      rpodItem.MATERIAL_ID = element.MATERIAL_ID;
+      rpodItem.STATUS = element.STATUS;
+      payLoad.MATERIALS.push(rpodItem);
+    });
+
+    console.log('p', payLoad);
+
+    const FORMDATA: FormData = new FormData();
+
+    if (this.fileToUploadList && this.fileToUploadList.length) {
+      this.fileToUploadList.forEach((x) => {
+        FORMDATA.append(x.name, x, x.name);
+      });
+      FORMDATA.append("Payload", JSON.stringify(payLoad));
+    }
+    console.log(FORMDATA);
+    // this.isProgressBarVisibile = true;
+    // this._reversePod.confirmReversePod(FORMDATA).subscribe({
+    //     next: (res) => {
+    // if(res){
+    //     this.isProgressBarVisibile = false;
+    // }
+    //     },
+    //     error: (err) => {
+    //     this.isProgressBarVisibile = false;
+    //     }
+    // });
+    //     this.isProgressBarVisibile = false;
+  }
 
   handleFileInput(evt) {
     if (evt.target.files && evt.target.files.length > 0) {
@@ -1396,13 +1459,14 @@ export class ReverseLogisticsItemComponent implements OnInit {
       ) {
         this.fileToUploadList = [];
         this.fileToUploadList.push(evt.target.files[0]);
-        if (this.authenticationDetails.userRole == "Customer") {
-          this.confirmByCustomer();
-        } else if (
-          this.authenticationDetails.userRole == "Amararaja User"
-        ) {
-          this.confirmByDC();
-        }
+        this.confirmRpod();
+        // if (this.authenticationDetails.userRole == "Customer") {
+        //   this.confirmByCustomer();
+        // } else if (
+        //   this.authenticationDetails.userRole == "Amararaja User"
+        // ) {
+        //   this.confirmByDC();
+        // }
       } else {
         this.notificationSnackBarComponent.openSnackBar(
           "Please upload file size below 5 MB",
@@ -1481,17 +1545,5 @@ export class ReverseLogisticsItemComponent implements OnInit {
     //         SnackBarStatus.danger
     //     );
     // }
-  }
-
-  confirmReversePod(role:string){
-    const FORMDATA = new FormData();
-    this._reversePodService.confirmReversePod(FORMDATA).subscribe({
-      next:(res)=>{
-
-      },
-      error:(err)=>{
-        
-      }
-    });
   }
 }
