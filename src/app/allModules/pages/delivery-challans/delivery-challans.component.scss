@@ -1,0 +1,112 @@
+@import "src/@fuse/scss/fuse";
+
+#deliverychallans {
+    .center {
+        padding: 5px !important;
+        background-color: white;
+        height: 100% !important;
+        width: 100% !important;
+    }
+
+    .btnBg {
+        background-color: #efb577 !important;
+        color: white !important;
+    }
+
+    .tile {
+        @include mat-elevation(2);
+        min-height: 60px !important;
+        max-height: 250px !important;
+        width: 650px !important;
+
+        @media screen and (max-width: 696px) {
+            width: 100% !important;
+        }
+
+        img {
+            height: 36px;
+        }
+
+        cursor: pointer;
+    }
+
+    .container {
+        max-height: 400px;
+        overflow: auto;
+    }
+
+    .table {
+        width: 100%;
+
+        th {
+            color: white;
+            background-color: #121214;
+            min-width: 100px !important;
+            border-right: 1px solid #e0e0e0;
+            padding: 0px 10px;
+            text-align: left !important;
+        }
+
+        td {
+            font-size: 12px;
+            min-width: max-content !important;
+            text-align: left !important;
+            padding-left: 10px;
+        }
+
+        tr {
+            height: 50px;
+        }
+    }
+
+    #abnormal {
+        .mat-form-field-flex>.mat-form-field-infix {
+            padding: 0.3em 0px !important;
+            width: 100px !important;
+        }
+
+        .mat-form-field-label-wrapper {
+            top: -1.5em;
+        }
+
+        .mat-form-field-appearance-outline.mat-form-field-can-float.mat-form-field-should-float .mat-form-field-label {
+            transform: translateY(-1.1em) scale(0.75);
+            width: 133.33333%;
+        }
+
+        .mat-form-field-wrapper {
+            margin: 0 !important;
+            padding-bottom: 4px !important;
+            padding-top: 4px !important;
+            padding-right: 10px !important;
+        }
+
+        .mat-form-field-appearance-outline .mat-form-field-flex {
+            padding: 0 0.4em 0 0.4em;
+        }
+    }
+
+    // .custmApps {
+    //     min-width: 200px;
+    // }
+
+    .excelBtn {
+        // margin-top: -16px;
+        min-width: 0px;
+        background-color: white;
+        color: rgb(46, 125, 50);
+
+        &.mat-stroked-button {
+            // border-radius: 5px;
+            padding: 0px 8px;
+        }
+    }
+
+    .orangeBorderBottom {
+        border-bottom: 2px solid #fb7800;
+    }
+
+    mat-icon {
+        cursor: pointer;
+    }
+}

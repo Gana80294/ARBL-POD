@@ -1,0 +1,87 @@
+<div id="delete" class="page-layout carded fullwidth inner-scroll">
+    <div class="top-bg topBg"></div>
+    <div class="center normal">
+        <div class="m-12 p-0 content-card" fxFlex fxLayout="row">
+            <form
+                fxFlex
+                class="p-24 normal"
+                fxLayout="column"
+                autocomplete="off"
+                name="form"
+                fxLayoutAlign="start"
+                [formGroup]="DeleteInvoiceFormGroup"
+            >
+                <div fxLayout="row" class="pt-8">
+                    <div fxFlex class="h2 mb-24">Delete Invoice</div>
+                </div>
+
+                <div fxLayout="row wrap" fxLayoutAlign="start">
+                    <mat-form-field fxFlex>
+                        <input
+                            matInput
+                            placeholder="Invoice Number"
+                            formControlName="InvoiceNo"
+                            #InvoiceNo
+                        />
+                        <mat-error
+                            *ngIf="
+                                DeleteInvoiceFormGroup.get('InvoiceNo')
+                                    .touched &&
+                                DeleteInvoiceFormGroup.get(
+                                    'InvoiceNo'
+                                ).hasError('required')
+                            "
+                        >
+                            Invoice Number is required</mat-error
+                        >
+                    </mat-form-field>
+                </div>
+
+                <div
+                    fxLayout="row wrap"
+                    fxLayoutGap="10px"
+                    fxLayoutAlign="center"
+                >
+                    <button
+                        mat-raised-button
+                        class="btnBg"
+                        type="button"
+                        (click)="SearchInvoice(InvoiceNo.value)"
+                    >
+                        Search
+                    </button>
+                    <button
+                        mat-raised-button
+                        class="btnBg"
+                        type="button"
+                        (click)="DeleteInvoice(InvoiceNo.value)"
+                    >
+                        Delete
+                    </button>
+                </div>
+
+                <div *ngIf="InvoiceData != null">
+                    <h3>Invoice Details</h3>
+                    <div fxLayout="column" *ngFor="let data of InvoiceData">
+                        <span class="p10"
+                            ><b>Invoice Number: </b>{{ data?.INV_NO }}</span
+                        >
+                        <span class="p10"
+                            ><b>Invoice Date: </b>{{ data?.INV_DATE | date }}</span
+                        >
+                        <span class="p10"
+                            ><b>Customer Code: </b>{{ data?.CUSTOMER }}</span
+                        >
+                        <span class="p10"
+                            ><b>Customer Name: </b
+                            >{{ data?.CUSTOMER_NAME }}</span
+                        >
+                        <span class="p10"
+                            ><b>Status: </b>{{ data?.STATUS }}</span
+                        >
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

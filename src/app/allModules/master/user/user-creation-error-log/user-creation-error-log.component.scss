@@ -1,0 +1,48 @@
+@import "src/@fuse/scss/fuse";
+
+.userCreationLog-dialog {
+    width: 100vw !important;
+    overflow: auto !important;
+   margin: 5% !important;
+    .mat-radio-button {
+        margin: 0 5px;
+    }
+    
+    
+img{
+    width: fix-content !important;
+    height: 100% !important;
+    margin: 0 auto 1em auto;
+    width: fit-content;
+}
+
+    .mat-dialog-content {
+        margin: 0px;
+       
+        padding: 5px;
+        max-height: 80vh;
+        overflow-x: auto;
+
+        .tbl{
+            width: 100%;
+            th {
+                background-color: #121214;
+                color: white;
+                
+        
+            }
+        }
+    }
+    .toolBg {
+        background-color: #121214 !important;
+        color: white !important;
+    }
+    .btnBg {
+        background-color: #efb577 !important;
+        color: white !important;
+    }
+    .closeBtn {
+        color: #efb577 !important;
+    }
+    
+}

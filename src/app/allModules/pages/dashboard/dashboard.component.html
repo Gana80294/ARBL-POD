@@ -1,0 +1,539 @@
+<div id="dashboard" class="page-layout carded" fusePerfectScrollbar>
+    <div class="center" fxLayout="column" fxLayoutGap="5px">
+        <form autocomplete="off" name="form" [formGroup]="InvoiceFilterFormGroup" novalidate>
+            <div fxLayout="row wrap" class="mt-4 mx-12">
+                <!-- <mat-form-field class="mx-8" fxFlex>
+          <mat-select matInput formControlName="Status" placeholder="Status">
+            <mat-option [value]="rest.value" *ngFor="let rest of AllStatusTemplates">{{rest.key}}
+            </mat-option>
+          </mat-select>
+          <mat-error class="pl-4 errorClass" *ngIf="InvoiceFilterFormGroup.get('Status').touched &&
+          InvoiceFilterFormGroup.get('Status').hasError('required')">
+            From date is required
+          </mat-error>
+        </mat-form-field> -->
+                <!-- <mat-form-field class="mx-8" fxFlex
+          [style.display]="(currentUserRole | lowercase)==='amararaja user'?'inherit':'none'">
+          
+          <mat-select placeholder="Organization" formControlName="Organization">
+            <mat-option value="all" (click)="togglePerOne1()">All</mat-option>
+            <mat-option *ngFor="let mp of AllOrganizations" [value]="mp.OrganizationCode" (click)="togglePerOne1()">
+              {{mp.OrganizationCode}}</mat-option>
+          </mat-select>
+        </mat-form-field> -->
+                <app-organization-control class="mx-8" fxFlex="18" [style.display]="
+                        (currentUserRole | lowercase) === 'amararaja user'
+                            ? 'inherit'
+                            : 'none'
+                    " [AllOrganizations]="AllOrganizations" formControlName="Organization">
+                </app-organization-control>
+                <!-- <mat-form-field class="mx-8" fxFlex
+          [style.display]="(currentUserRole | lowercase)==='amararaja user'?'inherit':'none'">
+          
+          <mat-select placeholder="Division" formControlName="Division">
+            <mat-option [value]="divi" *ngFor="let divi of Divisions">{{divi}}</mat-option>
+          </mat-select>
+        </mat-form-field> -->
+                <app-division-control class="mx-8" fxFlex="18" [style.display]="
+                        (currentUserRole | lowercase) === 'amararaja user'
+                            ? 'inherit'
+                            : 'none'
+                    " [Divisions]="Divisions" formControlName="Division">
+                </app-division-control>
+                <!-- <mat-form-field class="mx-8" fxFlex="17"
+          [style.display]="(currentUserRole | lowercase)==='amararaja user'?'inherit':'none'">
+          
+          <mat-select placeholder="Plant" formControlName="PlantList" multiple>
+            <mat-option value="all" #allSelected (click)="toggleAllSelection()">All</mat-option>
+            <mat-option *ngFor="let mp of FilteredPlants" [value]="mp.PlantCode" (click)="togglePerOne()">
+              {{mp.PlantCode}}</mat-option>
+          </mat-select>
+        </mat-form-field> -->
+                <app-custom-controls-plant class="mx-8" fxFlex="18" [style.display]="
+                        (currentUserRole | lowercase) === 'amararaja user'
+                            ? 'inherit'
+                            : 'none'
+                    " [AllPlants]="AllPlants" formControlName="PlantList">
+                </app-custom-controls-plant>
+
+                <app-custom-controls-plant-group class="mx-8" fxFlex="18" [style.display]="
+                    (currentUserRole | lowercase) === 'amararaja user'
+                        ? 'inherit'
+                        : 'none'
+                " [AllPlants]="AllPlantGroups" formControlName="PlantGroupList">
+                </app-custom-controls-plant-group>
+
+                <mat-form-field class="mx-8" fxFlex>
+                    <input matInput [matDatepicker]="picker" placeholder="Start Date" formControlName="StartDate"
+                        (keydown)="onKeydown($event)" (dateChange)="DateSelected()" />
+                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                    <mat-datepicker #picker></mat-datepicker>
+                    <mat-error class="pl-4 errorClass" *ngIf="
+                            InvoiceFilterFormGroup.get('StartDate').touched &&
+                            InvoiceFilterFormGroup.get('StartDate').hasError(
+                                'required'
+                            )
+                        ">
+                        Start date is required
+                    </mat-error>
+                </mat-form-field>
+                <div class="mx-8" fxFlex>
+                    <mat-form-field style="width: 100%">
+                        <input matInput [matDatepicker]="picker1" placeholder="End Date" formControlName="EndDate"
+                            (keydown)="onKeydown($event)" (dateChange)="DateSelected()" />
+                        <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+                        <mat-datepicker #picker1></mat-datepicker>
+                        <mat-error class="pl-4 errorClass" *ngIf="
+                                InvoiceFilterFormGroup.get('EndDate').touched &&
+                                InvoiceFilterFormGroup.get('EndDate').hasError(
+                                    'required'
+                                )
+                            ">
+                            End date is required
+                        </mat-error>
+                    </mat-form-field>
+                    <div *ngIf="isDateError" style="
+                            color: #f44336;
+                            font-size: 12px;
+                            margin-top: -16px;
+                        ">
+                        End date should not be less than from date
+                    </div>
+                </div>
+                <!-- <ng-multiselect-dropdown class="container"  style="width: 100%;" class="mx-8" fxFlex="17"
+        [placeholder]="'Customer Groups'"
+        [settings]="dropdownSettings"
+        [data]="AllCustomerGroups"
+        formControlName="CustomerGroup"
+        style="margin-top: 15px;"
+      >
+      </ng-multiselect-dropdown> -->
+                <app-searchable-multi-select class="mx-8" fxFlex="17" [AllCustomerGroups]="AllCustomerGroups"
+                    formControlName="CustomerGroup" [style.display]="
+                        (currentUserRole | lowercase) === 'amararaja user'
+                            ? 'flex'
+                            : 'none'
+                    ">
+                </app-searchable-multi-select>
+                <!-- <mat-form-field [style.display]="(currentUserRole | lowercase)==='amararaja user'?'inherit':'none'" class="mx-8" fxFlex>
+          <mat-select placeholder="Customer Group" formControlName="CustomerGroup" multiple>
+            <mat-form-field style="width: 100%;padding: 1%;" appearance="fill">
+                <mat-label>Search</mat-label>
+                <input matInput  formControlName="CustomerGroupSearch">
+              </mat-form-field>
+            <mat-option #allSelected3 (click)="toggleAllSelection3()" value="all">
+                All
+            </mat-option>
+          <mat-option (click)="toggleSalesGrpPerOne()" *ngFor="let cg of FilteredCustomerGroups" [value]="cg.CustomerGroupCode">
+            {{cg.CustomerGroupCode}}
+          </mat-option>
+        </mat-select>
+        </mat-form-field> -->
+                <mat-form-field [style.display]="
+                        (currentUserRole | lowercase) === 'amararaja user'
+                            ? 'inherit'
+                            : 'none'
+                    " class="mx-8" fxFlex="17">
+                    <input matInput placeholder="Customer Name" formControlName="CustomerName" />
+                </mat-form-field>
+
+                <!-- <mat-form-field class="mx-8" fxFlex>
+          <input matInput placeholder="LR number" formControlName="LRNumber">
+        </mat-form-field> -->
+                <div fxFlex class="mr-8 ml-24 mt-16">
+                    <button mat-raised-button class="btnBg" (click)="SearchInvoices()">
+                        Search
+                    </button>
+                </div>
+            </div>
+        </form>
+        <div fxFlex fxLayout class="mt-16">
+            <div class="tile mx-20" fxFlex="34" fxLayout="column"
+                style="background-color: white; height: 300px !important">
+                <div class="position-relative p-12" fxLayout="row" fxLayoutAlign="space-between center">
+                    <span>APPROVED / PENDING INVOICES</span>
+                    <!-- <span class="smallerFont">Past 7 Days</span> -->
+                    <img src="assets/images/adjust.svg" style="height: 15px !important" />
+                </div>
+                <div style="border-bottom: 2px solid #f3f6ee"></div>
+                <div id="doughnutChart" fxFlex fxLayoutAlign="center">
+                    <div style="display: block; height: 200px; width: 385px">
+                        <canvas baseChart [data]="doughnutChartData" [labels]="doughnutChartLabels"
+                            [chartType]="doughnutChartType" [options]="doughnutChartOptions" [colors]="colors"
+                            (chartClick)="doughnutChartClicked($event)">
+                        </canvas>
+                    </div>
+                    <!-- <span>Kame hame</span> -->
+                </div>
+            </div>
+            <div class="tile mx-20" fxFlex="33" fxLayout="column"
+                style="background-color: white; height: 300px !important">
+                <div class="position-relative p-12" fxLayout="row" fxLayoutAlign="space-between center">
+                    <span>PROPOSED DELIVERY DATE</span>
+                    <!-- <span class="smallerFont">Past 7 Days</span> -->
+                    <img src="assets/images/adjust.svg" style="height: 15px !important" />
+                </div>
+                <div style="border-bottom: 2px solid #f3f6ee"></div>
+                <div id="doughnutChart" fxFlex fxLayoutAlign="center">
+                    <div style="display: block; height: 200px; width: 320px">
+                        <canvas baseChart [data]="doughnutChartData2" [labels]="doughnutChartLabels2"
+                            [chartType]="doughnutChartType2" [options]="doughnutChartOptions2" [colors]="colors2"
+                            (chartClick)="doughnutChart2Clicked($event)">
+                        </canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="tile mx-20" fxFlex="33" fxLayout="column"
+                style="background-color: white; height: 300px !important">
+                <div class="position-relative p-12" fxLayout="row" fxLayoutAlign="space-between center">
+                    <span>DELIVERY STATUS</span>
+                    <!-- <span class="smallerFont">Past 7 Days</span> -->
+                    <img src="assets/images/adjust.svg" style="height: 15px !important" />
+                </div>
+                <div style="border-bottom: 2px solid #f3f6ee"></div>
+                <div id="doughnutChart" fxFlex fxLayoutAlign="center">
+                    <div style="display: block; height: 200px; width: 320px">
+                        <canvas baseChart [data]="doughnutChartData1" [labels]="doughnutChartLabels1"
+                            [chartType]="doughnutChartType1" [options]="doughnutChartOptions1" [colors]="colors1"
+                            (chartClick)="doughnutChart1Clicked($event)">
+                        </canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="border-bottom: 2px solid #f3f6ee" class="my-12 mx-24"></div>
+
+        <div fxFlex class="mx-20">
+            <div fxLayout fxLayoutAlign="start center" class="pt-8 pb-8">
+                <span class="orangeBorderBottom h2"> {{ currentLabel }}</span>
+                <div fxFlex align="end">
+                    <button *ngIf="isLoadMoreVisible" mat-flat-button class="strokedBtnBg" (click)="LoadMoreData()">
+                        Load more..
+                    </button>
+                </div>
+            </div>
+            <div>
+                <!-- <div class="card m-16" *ngFor="let inv of allInvoiceHeaderDetails">
+          <div class="card-preview">
+            <div class="fuse-card variable-width">
+              <div class="p-16 cardHeader" fxLayout="column" fxLayoutAlign="center center">
+                <div class="text-bold">INVOICE NO </div>
+                <div class="text-bold colorPrimary">{{inv.ODIN}}</div>
+              </div>
+              <div class="ml-24 py-16">
+                <div class="px-4">
+                  <img src="assets/images/bunka.png">
+                  <span class="pl-16 h6 secondary-text">Vehicle No:</span>
+                  <div class="ml-8 dashhBorder customLineHeight">
+                    <span class="h4 pl-24 py-8">{{inv.VEHICLE_NO}}</span>
+                  </div>
+                </div>
+                <div class="px-4">
+                  <img src="assets/images/bunka.png">
+                  <span class="pl-16 h6 secondary-text">Ewaybill No:</span>
+                  <div class="ml-8 dashhBorder customLineHeight">
+                    <span class="h4 pl-24 py-8">{{inv.EWAYBILL_NO}}</span>
+                  </div>
+                </div>
+                <div class="px-4">
+                  <img src="assets/images/bunka.png">
+                  <span class="pl-16 h6 secondary-text">Outbound Delivery:</span>
+                  <div class="ml-8 customLineHeight">
+                    <span class="h4 pl-24 py-8">{{inv.OUTBOUND_DELIVERY}}</span>
+                  </div>
+                </div>
+
+              </div>
+              <div class="pb-16" fxLayout="row" fxLayoutAlign="center center">
+                <button mat-raised-button class="buttonPrimary" (click)="GoToInvoiceItem(inv)">View Details</button>
+              </div>
+            </div>
+          </div>
+        </div> -->
+
+                <div class="example-container">
+                    <table class="table" mat-table [dataSource]="dataSource">
+                        <ng-container matColumnDef="ORGANIZATION">
+                            <th mat-header-cell *matHeaderCellDef>
+                                Organization
+                            </th>
+                            <td mat-cell *matCellDef="let element; let index = index"
+                                (click)="GoToInvoiceItem(element)">
+                                {{ element.ORGANIZATION }}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="DIVISION">
+                            <th mat-header-cell *matHeaderCellDef>Division</th>
+                            <td mat-cell *matCellDef="let element; let index = index"
+                                (click)="GoToInvoiceItem(element)">
+                                {{ element.DIVISION }}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="PLANT">
+                            <th mat-header-cell *matHeaderCellDef>
+                                Plant Code
+                            </th>
+                            <td mat-cell *matCellDef="let element; let index = index"
+                                (click)="GoToInvoiceItem(element)">
+                                {{ element.PLANT }}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="PLANT_NAME">
+                            <th mat-header-cell *matHeaderCellDef>
+                                Plant Name
+                            </th>
+                            <td mat-cell *matCellDef="let element; let index = index"
+                                (click)="GoToInvoiceItem(element)">
+                                {{ element.PLANT_NAME }}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="ODIN">
+                            <th mat-header-cell *matHeaderCellDef>
+                                Invoice No
+                            </th>
+                            <td mat-cell *matCellDef="let element; let index = index"
+                                (click)="GoToInvoiceItem(element)">
+                                {{ element.ODIN }}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="INV_NO">
+                            <th mat-header-cell *matHeaderCellDef>
+                                Reference No
+                            </th>
+                            <td mat-cell *matCellDef="let element; let index = index"
+                                (click)="GoToInvoiceItem(element)">
+                                {{ element.INV_NO }}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="INV_DATE">
+                            <th mat-header-cell *matHeaderCellDef>
+                                Invoice Date
+                            </th>
+                            <td mat-cell *matCellDef="let element; let index = index"
+                                (click)="GoToInvoiceItem(element)">
+                                {{ element.INV_DATE | date : "dd/MM/yyyy" }}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="INV_TYPE">
+                            <th mat-header-cell *matHeaderCellDef>
+                                Invoice Type
+                            </th>
+                            <td mat-cell *matCellDef="let element; let index = index"
+                                (click)="GoToInvoiceItem(element)">
+                                {{ element.INV_TYPE }}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="INVOICE_QUANTITY">
+                            <th mat-header-cell *matHeaderCellDef>
+                                Invoice Qty
+                            </th>
+                            <td mat-cell *matCellDef="let element; let index = index"
+                                (click)="GoToInvoiceItem(element)">
+                                {{ element.INVOICE_QUANTITY }}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="CUSTOMER">
+                            <th [style.display]="
+                                    (currentUserRole | lowercase) ===
+                                    'amararaja user'
+                                        ? 'table-cell'
+                                        : 'none'
+                                " mat-header-cell *matHeaderCellDef>
+                                Customer
+                            </th>
+                            <td [style.display]="
+                                    (currentUserRole | lowercase) ===
+                                    'amararaja user'
+                                        ? 'table-cell'
+                                        : 'none'
+                                " mat-cell *matCellDef="let element; let index = index"
+                                (click)="GoToInvoiceItem(element)">
+                                {{ element.CUSTOMER }}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="CUSTOMER_NAME">
+                            <th [style.display]="
+                                    (currentUserRole | lowercase) ===
+                                    'amararaja user'
+                                        ? 'table-cell'
+                                        : 'none'
+                                " mat-header-cell *matHeaderCellDef>
+                                Customer Name
+                            </th>
+                            <td [style.display]="
+                                    (currentUserRole | lowercase) ===
+                                    'amararaja user'
+                                        ? 'table-cell'
+                                        : 'none'
+                                " mat-cell *matCellDef="let element; let index = index"
+                                (click)="GoToInvoiceItem(element)">
+                                {{ element.CUSTOMER_NAME }}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="LR_NO">
+                            <th mat-header-cell *matHeaderCellDef>LR Number</th>
+                            <td mat-cell *matCellDef="let element; let index = index"
+                                (click)="GoToInvoiceItem(element)">
+                                {{ element.LR_NO }}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="LR_DATE">
+                            <th mat-header-cell *matHeaderCellDef>LR Date</th>
+                            <td mat-cell *matCellDef="let element; let index = index"
+                                (click)="GoToInvoiceItem(element)">
+                                {{ element.LR_DATE | date : "dd/MM/yyyy" }}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="VEHICLE_NO">
+                            <th mat-header-cell *matHeaderCellDef>
+                                Vehicle No
+                            </th>
+                            <td mat-cell *matCellDef="let element; let index = index"
+                                (click)="GoToInvoiceItem(element)">
+                                {{ element.VEHICLE_NO }}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="PROPOSED_DELIVERY_DATE">
+                            <th mat-header-cell *matHeaderCellDef>
+                                Proposed Delivery Date
+                            </th>
+                            <td mat-cell *matCellDef="let element; let index = index"
+                                (click)="GoToInvoiceItem(element)">
+                                {{
+                                element.PROPOSED_DELIVERY_DATE
+                                | date : "dd/MM/yyyy"
+                                }}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="VEHICLE_REPORTED_DATE">
+                            <th mat-header-cell *matHeaderCellDef>
+                                Vehicle Unloaded Date
+                            </th>
+                            <td mat-cell *matCellDef="let element; let index = index"
+                                (click)="GoToInvoiceItem(element)">
+                                {{
+                                element.VEHICLE_REPORTED_DATE
+                                | date : "dd/MM/yyyy"
+                                }}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="ACTUAL_DELIVERY_DATE">
+                            <th mat-header-cell *matHeaderCellDef>
+                                Acknowledgement Date
+                            </th>
+                            <td mat-cell *matCellDef="let element; let index = index"
+                                (click)="GoToInvoiceItem(element)">
+                                {{
+                                element.ACTUAL_DELIVERY_DATE
+                                | date : "dd/MM/yyyy h:mm:ss a"
+                                }}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="DRIVER_CONTACT">
+                            <th mat-header-cell *matHeaderCellDef>
+                                Driver Contact
+                            </th>
+                            <td mat-cell *matCellDef="let element; let index = index"
+                                (click)="GoToInvoiceItem(element)">
+                                {{ element.DRIVER_CONTACT }}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="TRACKING_LINK">
+                            <th mat-header-cell *matHeaderCellDef>
+                                Tracking Link
+                            </th>
+                            <td mat-cell *matCellDef="let element; let index = index">
+                                <button mat-raised-button class="btnBg" (click)="
+                                        trackProduct(element.TRACKING_LINK)
+                                    ">
+                                    Track
+                                </button>
+                                <!-- <span>
+                  <a [href]="element.TRACKING_LINK" target="_blank"></a>
+                </span> -->
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="TOTAL_DISTANCE">
+                            <th mat-header-cell *matHeaderCellDef>
+                                Total Distance
+                            </th>
+                            <td mat-cell *matCellDef="let element; let index = index"
+                                (click)="GoToInvoiceItem(element)">
+                                {{ element.TOTAL_DISTANCE }}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="TOTAL_TRAVEL_TIME">
+                            <th mat-header-cell *matHeaderCellDef>
+                                Travel Time
+                            </th>
+                            <td mat-cell *matCellDef="let element; let index = index"
+                                (click)="GoToInvoiceItem(element)">
+                                {{ element.TOTAL_TRAVEL_TIME }}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="STATUS">
+                            <th mat-header-cell *matHeaderCellDef>Status</th>
+                            <td mat-cell *matCellDef="let element; let index = index"
+                                (click)="GoToInvoiceItem(element)">
+                                {{ element.STATUS }}
+                            </td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                        <tr mat-row *matRowDef="
+                                let row;
+                                columns: displayedColumns;
+                                let index = index
+                            " style="cursor: pointer !important"></tr>
+                    </table>
+                    <div *ngIf="!allInvoiceDetails?.length">
+                        <mat-icon svgIcon="infoIcon" style="
+                                color: #1b56ca;
+                                margin-top: 10px;
+                                margin-left: 70px;
+                            "></mat-icon>
+                        <span style="margin-left: 10px">The table does not contain any data</span>
+                    </div>
+                    <mat-paginator [style.display]="
+                            allInvoiceDetails?.length ? 'inherit' : 'none'
+                        " [pageSizeOptions]="[5, 10, 25, 50, 100, 200, 500, 1000]"
+                        showFirstLastButtons></mat-paginator>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <mat-progress-spinner *ngIf="
+            isProgressBarVisibile ||
+            isProgressBarVisibile1 ||
+            isProgressBarVisibile2
+        " class="progressBarPostion" color="accent" mode="indeterminate">
+    </mat-progress-spinner>
+    <div id="overlay" *ngIf="
+            isProgressBarVisibile ||
+            isProgressBarVisibile1 ||
+            isProgressBarVisibile2
+        "></div>
+</div>

@@ -1,0 +1,25 @@
+<div id="ReversePodApprover" class="page-layout carded fullwidth inner-scroll">
+  <div class="top-bg topBg"></div>
+  <div class="center normal">
+    <div class="m-12 p-0 content-card" fxFlex fxLayout="row">
+      <div fxFlex class="p-24 normal" fxLayout="column" autocomplete="off" name="form" fxLayoutAlign="start">
+        <div fxLayout="row" class="pt-8">
+          <div fxFlex class="h2 mb-24">Reverse Logistics Approvers</div>
+        </div>
+
+        <div fxLayout="row wrap" fxLayoutAlign="start">
+          <mat-form-field fxFlex>
+            <mat-select multiple placeholder="Select DC Members..." [formControl]="approvers">
+              <mat-option [value]="approver.UserID" *ngFor="let approver of AllUsers">{{approver.UserName}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div>
+          <button mat-raised-button class="btnBg" type="button" (click)="Update()"> Update
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

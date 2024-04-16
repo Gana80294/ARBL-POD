@@ -1,0 +1,42 @@
+#home {
+
+    background-image: url("assets/images/backgrounds/Homebg.svg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-color: white;
+
+    .txt {
+        font-weight: bold;
+    }
+
+    .txtblue {
+        color: #efb577;
+    }
+
+    .txtCenter {
+        text-align: center;
+    }
+
+    .imgContainer {
+        padding: 20px;
+        // background: #f5fbff;
+        background: #fff7ef;
+        border: 2px solid #c4c5c8;
+        height: 75%;
+        border-radius: 5px;
+
+        .inside-container {
+            width: 100%;
+            height: 90%;
+
+            img {
+                width: 100%;
+                height: 100%;
+            }
+        }
+    }
+
+    .imgContainer:hover{
+        background: #f7cc9f;
+    }
+}

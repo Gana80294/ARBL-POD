@@ -1,0 +1,119 @@
+<div id="upload" class="page-layout carded fullwidth inner-scroll">
+    <div class="top-bg topBg"></div>
+
+    <div class="center">
+        <div class="content-card" fxFlex>
+            <div
+                class="carder"
+                *ngIf="authenticationDetails.userRole == 'Administrator'"
+                fxLayout="row wrap"
+            >
+                <!-- <input type="file" (change)="onFileSelected($event)"> -->
+                <!-- <button class="btnBg col-6" mat-raised-button  type="button">
+                      <mat-icon>upload</mat-icon>
+                        upload pdf
+                </button> -->
+                <div class="file-upload">
+                    <input
+                        type="file"
+                        id="pdf"
+                        name="pdf"
+                        onclick="this.value=null"
+                        #fileInput
+                        style="display: none"
+                        accept="application/pdf"
+                        (change)="onFileSelect($event, 'pdf')"
+                    />
+                    <button
+                        class="btnBg"
+                        for="pdf"
+                        mat-raised-button
+                        (click)="fileInput.click()"
+                    >
+                        <mat-icon>upload</mat-icon>
+                        Upload PDF
+                    </button>
+                </div>
+                <div class="file-upload">
+                    <input
+                        type="file"
+                        id="video"
+                        onclick="this.value=null"
+                        name="video"
+                        #fileInputs
+                        style="display: none"
+                        accept="video/mp4,video/x-m4v,video/*"
+                        (change)="onFileSelect($event, 'v')"
+                    />
+                    <button
+                        class="btnBg"
+                        for="video"
+                        mat-raised-button
+                        (click)="fileInputs.click()"
+                    >
+                        <mat-icon>upload</mat-icon>
+                        Upload Video
+                    </button>
+                </div>
+            </div>
+   
+            <mat-tab-group animationDuration="0ms">
+                
+                <mat-tab label="PDF">
+                    <div *ngIf="pdfUrl" fxLayout="column">
+                        <h1 class="header">{{ fileName }}</h1>
+                        <div class="viewer">
+                           <!-- <iframe style="height: 100%; width: 100%" [src]="pdfUrl"></iframe> -->
+                            <pdf-viewer 
+                               style="width: 100%;height: 500px;display: block;" 
+                               [src]="pdfUrl" 
+                               [render-text]="true"
+                               [show-all]="true"
+                               [original-size]="false">
+                            </pdf-viewer>
+                        </div>
+                    </div>
+                </mat-tab>
+                <mat-tab label="Video">
+                    <div *ngIf="videoUrl" fxLayout="column">
+                        <h1 class="header">{{ videofileName }}</h1>
+                        <div class="viewer">
+                            <video controls>
+                                <source [src]="videoUrl" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                </mat-tab>
+              
+              </mat-tab-group>
+
+
+
+            <!-- <h1 class="header">{{ fileName }}</h1>
+            <div *ngIf="videoUrl" class="viewer">
+                <video controls style="width: 100%; height: 52%">
+                    <source [src]="videoUrl" type="video/mp4" />
+                </video>
+            </div> -->
+
+            <!-- <div *ngIf="pdfUrl" class="viewer">
+        <pdf-viewer style="height: 80%; width: 100%;" [src]="pdfUrl" [original-size]="false"></pdf-viewer>
+      </div> -->
+      
+              <!-- <div *ngIf="pdfUrl" class="viewer">
+                <iframe
+                    style="height: 80%; width: 100%"
+                    [src]="pdfUrl"
+                ></iframe>
+            </div> -->
+        </div>
+    </div>
+    <mat-progress-spinner
+        *ngIf="IsProgressBarVisibile"
+        class="ProgressBarPostion"
+        color="accent"
+        mode="indeterminate"
+    >
+    </mat-progress-spinner>
+    <div id="overlay" *ngIf="IsProgressBarVisibile"></div>
+</div>

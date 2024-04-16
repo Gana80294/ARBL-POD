@@ -1,0 +1,33 @@
+@import "src/@fuse/scss/fuse";
+#delete{
+    .center{
+        padding:32px;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+    .content-card {
+         flex: 1;
+         position: relative;
+      }
+
+        input {
+          padding: 0 12px 0 8px;
+          background-color: #fafafa;
+          height: 36px;
+          border: none;
+        }
+
+     .topBg {
+        background-color: #efb577 !important
+      }
+      
+      .btnBg {
+        background-color: #efb577 !important;
+        color: white;
+      }
+
+      .p10{
+        padding: 10px;
+      }
+}
+

@@ -1,0 +1,62 @@
+<div id="reverseLogisticsUpdate" class="page-layout carded fullwidth inner-scroll">
+  <div class="top-bg topBg"></div>
+  <div class="center normal">
+    <div class="m-12 p-0 content-card" fxLayout>
+
+      <div fxFlex class="organization-side-bar">
+        <div class="sidenav-content" fusePerfectScrollbar fxFlex fxLayout="row">
+          <form fxFlex class="p-24 normal" autocomplete="off" fxLayout="column"
+            fxLayoutAlign="start" name="form" [formGroup]="UpdateReverseLogisticsFormGroup">
+            <div fxLayout="row" class="pt-8">
+              <div fxFlex class="h2 mb-24">Update Reverse Logistics Details</div>
+            </div>
+            <div fxLayout="row wrap" fxLayoutGap="15px" fxLayoutAlign="start">
+              <mat-form-field>
+                <input matInput placeholder="DC Number" formControlName="DC_NUMBER">
+                <mat-error
+                  *ngIf="UpdateReverseLogisticsFormGroup.get('DC_NUMBER').touched && UpdateReverseLogisticsFormGroup.get('DC_NUMBER').hasError('required')">
+                  DC Number is required</mat-error>
+              </mat-form-field>
+
+              <mat-form-field>
+                <input matInput placeholder="LR Number" formControlName="LR_NO">
+              </mat-form-field>
+
+              <mat-form-field>
+                <input matInput [matDatepicker]="picker1" placeholder="LR date" formControlName="LR_DATE"
+                  (focus)="picker1.open()">
+                <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+                <mat-datepicker #picker1></mat-datepicker>
+              </mat-form-field>
+
+              <mat-form-field>
+                <input matInput type="number" placeholder="Handovered Quantity" formControlName="HAND_OVERED_QUANTITY">
+              </mat-form-field>
+
+              <mat-form-field>
+                <input matInput type="number" placeholder="Receieved Quantity" formControlName="RECEIVED_QUANTITY">
+              </mat-form-field>
+
+              <mat-form-field>
+                <input matInput [matDatepicker]="picker" placeholder="Vehicle unloaded date"
+                  formControlName="DC_RECEIEVED_DATE" (focus)="picker.open()">
+                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+              </mat-form-field>
+            </div>
+
+            <div fxLayout="row wrap" fxLayoutAlign="center">
+              <button mat-raised-button class="btnBg" type="button" (click)="UpdateClicked()">
+                Update
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div fxFlex="1"></div>
+    </div>
+  </div>
+  <mat-progress-spinner *ngIf="IsProgressBarVisibile" class="ProgressBarPostion1" color="accent" mode="indeterminate">
+  </mat-progress-spinner>
+  <div id="overlay" *ngIf="IsProgressBarVisibile"></div>
+</div>

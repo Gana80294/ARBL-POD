@@ -1,0 +1,916 @@
+<div id="partial-confirmed" class="page-layout carded" fusePerfectScrollbar>
+    <div class="center" fxLayout="column" fxLayoutGap="10px">
+        <mat-card class="cardHeader p-8 pt-4 pb-0 m-0">
+            <div fxLayout>
+                <div fxFlex fxLayoutAlign="start center" class="h2">
+                    <b>Invoice Details</b>
+                </div>
+            </div>
+        </mat-card>
+        <div class="sidenav-content mt-4" style="background-color: white">
+            <div fxLayout="column" class="mt-10">
+                <form
+                    autocomplete="off"
+                    name="form"
+                    [formGroup]="InvoiceFilterFormGroup"
+                    novalidate
+                >
+                    <div fxLayout="row wrap" class="mt-4">
+                        <!-- <mat-form-field class="mx-8" fxFlex="18">
+              
+              <mat-select placeholder="Organization" formControlName="Organization">
+                <mat-option value="all" (click)="togglePerOne1()">All
+                </mat-option>
+                <mat-option *ngFor="let mp of AllOrganizations" [value]="mp.OrganizationCode" (click)="togglePerOne1()">
+                  {{mp.OrganizationCode}}</mat-option>
+              </mat-select>
+            </mat-form-field> -->
+                        <app-organization-control
+                            class="mx-8"
+                            fxFlex="18"
+                            [AllOrganizations]="AllOrganizations"
+                            formControlName="Organization"
+                        >
+                        </app-organization-control>
+                        <!-- <mat-form-field class="mx-8" fxFlex="18">
+              
+              <mat-select placeholder="Division" formControlName="Division">
+                <mat-option [value]="divi" *ngFor="let divi of Divisions">{{divi}}</mat-option>
+              </mat-select>
+            </mat-form-field> -->
+                        <app-division-control
+                            class="mx-8"
+                            fxFlex="18"
+                            [Divisions]="Divisions"
+                            formControlName="Division"
+                        >
+                        </app-division-control>
+
+                        <!-- <mat-form-field class="mx-8" fxFlex="18">
+              
+              <mat-select placeholder="Plant" formControlName="PlantList" multiple>
+                <mat-option #allSelected (click)="toggleAllSelection()" value="all">All</mat-option>
+                <mat-option *ngFor="let mp of FilteredPlants" [value]="mp.PlantCode" (click)="togglePerOne()">
+                  {{mp.PlantCode}}</mat-option>
+              </mat-select>
+            </mat-form-field> -->
+                        <app-custom-controls-plant
+                            class="mx-8"
+                            fxFlex="18"
+                            [AllPlants]="AllPlants"
+                            formControlName="PlantList"
+                        >
+                        </app-custom-controls-plant>
+                        <mat-form-field class="mx-8" fxFlex="18">
+                            <input
+                                matInput
+                                placeholder="Invoice No"
+                                formControlName="InvoiceNumber"
+                            />
+                        </mat-form-field>
+                        <mat-form-field class="mx-8" fxFlex="18">
+                            <input
+                                matInput
+                                placeholder="Customer Name"
+                                formControlName="CustomerName"
+                            />
+                        </mat-form-field>
+                        <!-- <ng-multiselect-dropdown fxFlex="18" 
+            [placeholder]="'Customer Groups'"
+            [settings]="dropdownSettings"
+            [data]="AllCustomerGroups"
+            formControlName="CustomerGroup"
+            style="margin-top: 15px;"
+            
+          >
+          </ng-multiselect-dropdown> -->
+                        <app-searchable-multi-select
+                            class="mx-8"
+                            fxFlex="18"
+                            [AllCustomerGroups]="AllCustomerGroups"
+                            formControlName="CustomerGroup"
+                        >
+                        </app-searchable-multi-select>
+                        <mat-form-field class="mx-8" fxFlex="18">
+                            <input
+                                matInput
+                                [matDatepicker]="picker"
+                                placeholder="Start Date"
+                                formControlName="StartDate"
+                                (keydown)="onKeydown($event)"
+                                (dateChange)="DateSelected()"
+                            />
+                            <mat-datepicker-toggle
+                                matSuffix
+                                [for]="picker"
+                            ></mat-datepicker-toggle>
+                            <mat-datepicker #picker></mat-datepicker>
+                            <mat-error
+                                class="pl-4 errorClass"
+                                *ngIf="
+                                    InvoiceFilterFormGroup.get('StartDate')
+                                        .touched &&
+                                    InvoiceFilterFormGroup.get(
+                                        'StartDate'
+                                    ).hasError('required')
+                                "
+                            >
+                                Start date is required
+                            </mat-error>
+                        </mat-form-field>
+                        <div class="mx-8" fxFlex="18">
+                            <mat-form-field style="width: 100%">
+                                <input
+                                    matInput
+                                    [matDatepicker]="picker1"
+                                    placeholder="End Date"
+                                    formControlName="EndDate"
+                                    (keydown)="onKeydown($event)"
+                                    (dateChange)="DateSelected()"
+                                />
+                                <mat-datepicker-toggle
+                                    matSuffix
+                                    [for]="picker1"
+                                ></mat-datepicker-toggle>
+                                <mat-datepicker #picker1></mat-datepicker>
+                                <mat-error
+                                    class="pl-4 errorClass"
+                                    *ngIf="
+                                        InvoiceFilterFormGroup.get('EndDate')
+                                            .touched &&
+                                        InvoiceFilterFormGroup.get(
+                                            'EndDate'
+                                        ).hasError('required')
+                                    "
+                                >
+                                    End date is required
+                                </mat-error>
+                            </mat-form-field>
+                            <div
+                                *ngIf="isDateError"
+                                style="
+                                    color: #f44336;
+                                    font-size: 12px;
+                                    margin-top: -16px;
+                                "
+                            >
+                                End date should not be less than from date
+                            </div>
+                        </div>
+                        <div fxFlex="18" class="mx-8 mt-16">
+                            <button
+                                mat-raised-button
+                                class="btnBg"
+                                (click)="SearchInvoices()"
+                            >
+                                Search
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                <div flex class="mt-10 mr-16">
+                    <div fxLayout fxLayoutAlign="start center">
+                        <div fxFlex>
+                            <button
+                                *ngIf="isLoadMoreVisible"
+                                mat-flat-button
+                                class="strokedBtnBg"
+                                (click)="LoadMoreData()"
+                            >
+                                Load more..
+                            </button>
+                        </div>
+                        <div fxFlex align="end">
+                            <button
+                                (click)="exportAsXLSX()"
+                                class="excelBtn mb-8"
+                                mat-stroked-button
+                            >
+                                <img
+                                    class="excelImg"
+                                    src="assets/images/excel.png"
+                                />
+                                Export to excel
+                            </button>
+                            <button
+                                (click)="ModifyLayout()"
+                                class="modifyLayoutBtn mb-8"
+                                mat-stroked-button
+                            >
+                                <img
+                                    class="modifyLayout"
+                                    src="assets/images/menu/notepad.png"
+                                />
+                            </button>
+                        </div>
+                    </div>
+                    <div fxLayout="column" class="example-container">
+                        <table
+                            class="tableBodyScroll"
+                            mat-table
+                            [dataSource]="dataSource"
+                            matSort
+                            [@animateStagger]="{ value: '50' }"
+                        >
+                            <ng-container matColumnDef="PLANT_NAME">
+                                <th
+                                    [hidden]="isColumnHide('PLANT_NAME')"
+                                    mat-header-cell
+                                    *matHeaderCellDef
+                                    mat-sort-header
+                                >
+                                    Plant Name
+                                </th>
+                                <td
+                                    [hidden]="isColumnHide('PLANT_NAME')"
+                                    mat-cell
+                                    *matCellDef="let element"
+                                    (click)="invoiceRowClick(element)"
+                                >
+                                    {{ element.PLANT_NAME }}
+                                </td>
+                            </ng-container>
+                            <ng-container matColumnDef="ODIN">
+                                <th
+                                    [hidden]="isColumnHide('ODIN')"
+                                    mat-header-cell
+                                    *matHeaderCellDef
+                                    mat-sort-header
+                                >
+                                    Invoice No
+                                </th>
+                                <td
+                                    [hidden]="isColumnHide('ODIN')"
+                                    mat-cell
+                                    *matCellDef="let element"
+                                    (click)="invoiceRowClick(element)"
+                                >
+                                    {{ element.ODIN }}
+                                </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="INV_NO">
+                                <th
+                                    [hidden]="isColumnHide('INV_NO')"
+                                    mat-header-cell
+                                    *matHeaderCellDef
+                                    mat-sort-header
+                                >
+                                    Reference No
+                                </th>
+                                <td
+                                    [hidden]="isColumnHide('INV_NO')"
+                                    mat-cell
+                                    *matCellDef="let element"
+                                    (click)="invoiceRowClick(element)"
+                                >
+                                    {{ element.INV_NO }}
+                                </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="ITEM_NO">
+                                <th
+                                    [hidden]="isColumnHide('ITEM_NO')"
+                                    mat-header-cell
+                                    *matHeaderCellDef
+                                    mat-sort-header
+                                >
+                                    Item
+                                </th>
+                                <td
+                                    [hidden]="isColumnHide('ITEM_NO')"
+                                    mat-cell
+                                    *matCellDef="let element"
+                                    (click)="invoiceRowClick(element)"
+                                >
+                                    {{ element.ITEM_NO }}
+                                </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="INV_DATE">
+                                <th
+                                    [hidden]="isColumnHide('INV_DATE')"
+                                    mat-header-cell
+                                    *matHeaderCellDef
+                                    mat-sort-header
+                                >
+                                    Invoice Date
+                                </th>
+                                <td
+                                    [hidden]="isColumnHide('INV_DATE')"
+                                    mat-cell
+                                    *matCellDef="let element"
+                                    (click)="invoiceRowClick(element)"
+                                >
+                                    {{ element.INV_DATE | date : "dd/MM/yyyy" }}
+                                </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="INV_TYPE">
+                                <th
+                                    [hidden]="isColumnHide('INV_TYPE')"
+                                    mat-header-cell
+                                    *matHeaderCellDef
+                                    mat-sort-header
+                                >
+                                    Invoice Type
+                                </th>
+                                <td
+                                    [hidden]="isColumnHide('INV_TYPE')"
+                                    mat-cell
+                                    *matCellDef="let element"
+                                    (click)="invoiceRowClick(element)"
+                                >
+                                    {{ element.INV_TYPE }}
+                                </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="OUTBOUND_DELIVERY">
+                                <th
+                                    [hidden]="isColumnHide('OUTBOUND_DELIVERY')"
+                                    mat-header-cell
+                                    *matHeaderCellDef
+                                    mat-sort-header
+                                >
+                                    Outbound Delivery
+                                </th>
+                                <td
+                                    [hidden]="isColumnHide('OUTBOUND_DELIVERY')"
+                                    mat-cell
+                                    *matCellDef="let element"
+                                    (click)="invoiceRowClick(element)"
+                                >
+                                    {{ element.OUTBOUND_DELIVERY }}
+                                </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="OUTBOUND_DELIVERY_DATE">
+                                <th
+                                    [hidden]="
+                                        isColumnHide('OUTBOUND_DELIVERY_DATE')
+                                    "
+                                    mat-header-cell
+                                    *matHeaderCellDef
+                                    mat-sort-header
+                                >
+                                    Outbound delivery Date
+                                </th>
+                                <td
+                                    [hidden]="
+                                        isColumnHide('OUTBOUND_DELIVERY_DATE')
+                                    "
+                                    mat-cell
+                                    *matCellDef="let element"
+                                    (click)="invoiceRowClick(element)"
+                                >
+                                    {{
+                                        element.OUTBOUND_DELIVERY_DATE
+                                            | date : "dd/MM/yyyy"
+                                    }}
+                                </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="PLANT">
+                                <th
+                                    [hidden]="isColumnHide('PLANT')"
+                                    mat-header-cell
+                                    *matHeaderCellDef
+                                    mat-sort-header
+                                >
+                                    Plant Code
+                                </th>
+                                <td
+                                    [hidden]="isColumnHide('PLANT')"
+                                    mat-cell
+                                    *matCellDef="let element"
+                                    (click)="invoiceRowClick(element)"
+                                >
+                                    {{ element.PLANT }}
+                                </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="ORGANIZATION">
+                                <th
+                                    [hidden]="isColumnHide('ORGANIZATION')"
+                                    mat-header-cell
+                                    *matHeaderCellDef
+                                    mat-sort-header
+                                >
+                                    Organization
+                                </th>
+                                <td
+                                    [hidden]="isColumnHide('ORGANIZATION')"
+                                    mat-cell
+                                    *matCellDef="let element"
+                                    (click)="invoiceRowClick(element)"
+                                >
+                                    {{ element.ORGANIZATION }}
+                                </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="DIVISION">
+                                <th
+                                    [hidden]="isColumnHide('DIVISION')"
+                                    mat-header-cell
+                                    *matHeaderCellDef
+                                    mat-sort-header
+                                >
+                                    Division
+                                </th>
+                                <td
+                                    [hidden]="isColumnHide('DIVISION')"
+                                    mat-cell
+                                    *matCellDef="let element"
+                                    (click)="invoiceRowClick(element)"
+                                >
+                                    {{ element.DIVISION }}
+                                </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="CUSTOMER">
+                                <th
+                                    [hidden]="isColumnHide('CUSTOMER')"
+                                    mat-header-cell
+                                    *matHeaderCellDef
+                                    mat-sort-header
+                                >
+                                    Customer
+                                </th>
+                                <td
+                                    [hidden]="isColumnHide('CUSTOMER')"
+                                    mat-cell
+                                    *matCellDef="let element"
+                                    (click)="invoiceRowClick(element)"
+                                >
+                                    {{ element.CUSTOMER }}
+                                </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="CUSTOMER_NAME">
+                                <th
+                                    [hidden]="isColumnHide('CUSTOMER_NAME')"
+                                    mat-header-cell
+                                    *matHeaderCellDef
+                                    mat-sort-header
+                                >
+                                    Customer Name
+                                </th>
+                                <td
+                                    [hidden]="isColumnHide('CUSTOMER_NAME')"
+                                    mat-cell
+                                    *matCellDef="let element"
+                                    (click)="invoiceRowClick(element)"
+                                >
+                                    {{ element.CUSTOMER_NAME }}
+                                </td>
+                            </ng-container>
+                            <ng-container matColumnDef="CUSTOMER_DESTINATION">
+                                <th
+                                    [hidden]="
+                                        isColumnHide('CUSTOMER_DESTINATION')
+                                    "
+                                    mat-header-cell
+                                    *matHeaderCellDef
+                                    mat-sort-header
+                                >
+                                    Customer Destination
+                                </th>
+                                <td
+                                    [hidden]="
+                                        isColumnHide('CUSTOMER_DESTINATION')
+                                    "
+                                    mat-cell
+                                    *matCellDef="let element"
+                                    (click)="invoiceRowClick(element)"
+                                >
+                                    {{ element.CUSTOMER_DESTINATION }}
+                                </td>
+                            </ng-container>
+                            <ng-container matColumnDef="CUSTOMER_GROUP">
+                                <th
+                                    [hidden]="isColumnHide('CUSTOMER_GROUP')"
+                                    mat-header-cell
+                                    *matHeaderCellDef
+                                    mat-sort-header
+                                >
+                                    Customer Group
+                                </th>
+                                <td
+                                    [hidden]="isColumnHide('CUSTOMER_GROUP')"
+                                    mat-cell
+                                    *matCellDef="let element"
+                                    (click)="invoiceRowClick(element)"
+                                >
+                                    {{ element.CUSTOMER_GROUP }}
+                                </td>
+                            </ng-container>
+                            <ng-container matColumnDef="CUSTOMER_GROUP_DESC">
+                                <th
+                                    [hidden]="
+                                        isColumnHide('CUSTOMER_GROUP_DESC')
+                                    "
+                                    mat-header-cell
+                                    *matHeaderCellDef
+                                    mat-sort-header
+                                >
+                                    Customer Group Desc
+                                </th>
+                                <td
+                                    [hidden]="
+                                        isColumnHide('CUSTOMER_GROUP_DESC')
+                                    "
+                                    mat-cell
+                                    *matCellDef="let element"
+                                    (click)="invoiceRowClick(element)"
+                                >
+                                    {{ element.CUSTOMER_GROUP_DESC }}
+                                </td>
+                            </ng-container>
+                            <ng-container matColumnDef="SECTOR_DESCRIPTION">
+                                <th
+                                    [hidden]="
+                                        isColumnHide('SECTOR_DESCRIPTION')
+                                    "
+                                    mat-header-cell
+                                    *matHeaderCellDef
+                                    mat-sort-header
+                                >
+                                    Sector
+                                </th>
+                                <td
+                                    [hidden]="
+                                        isColumnHide('SECTOR_DESCRIPTION')
+                                    "
+                                    mat-cell
+                                    *matCellDef="let element"
+                                    (click)="invoiceRowClick(element)"
+                                >
+                                    {{ element.SECTOR_DESCRIPTION }}
+                                </td>
+                            </ng-container>
+                            <ng-container matColumnDef="LR_NO">
+                                <th
+                                    [hidden]="isColumnHide('LR_NO')"
+                                    mat-header-cell
+                                    *matHeaderCellDef
+                                    mat-sort-header
+                                >
+                                    LR No
+                                </th>
+                                <td
+                                    [hidden]="isColumnHide('LR_NO')"
+                                    mat-cell
+                                    *matCellDef="let element"
+                                    (click)="invoiceRowClick(element)"
+                                >
+                                    {{ element.LR_NO }}
+                                </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="LR_DATE">
+                                <th
+                                    [hidden]="isColumnHide('LR_DATE')"
+                                    mat-header-cell
+                                    *matHeaderCellDef
+                                    mat-sort-header
+                                >
+                                    LR Date
+                                </th>
+                                <td
+                                    [hidden]="isColumnHide('LR_DATE')"
+                                    mat-cell
+                                    *matCellDef="let element"
+                                    (click)="invoiceRowClick(element)"
+                                >
+                                    {{ element.LR_DATE | date : "dd/MM/yyyy" }}
+                                </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="VEHICLE_NO">
+                                <th
+                                    [hidden]="isColumnHide('VEHICLE_NO')"
+                                    mat-header-cell
+                                    *matHeaderCellDef
+                                    mat-sort-header
+                                >
+                                    Vehicle No
+                                </th>
+                                <td
+                                    [hidden]="isColumnHide('VEHICLE_NO')"
+                                    mat-cell
+                                    *matCellDef="let element"
+                                    (click)="invoiceRowClick(element)"
+                                >
+                                    {{ element.VEHICLE_NO }}
+                                </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="CARRIER">
+                                <th
+                                    [hidden]="isColumnHide('CARRIER')"
+                                    mat-header-cell
+                                    *matHeaderCellDef
+                                    mat-sort-header
+                                >
+                                    Carrier
+                                </th>
+                                <td
+                                    [hidden]="isColumnHide('CARRIER')"
+                                    mat-cell
+                                    *matCellDef="let element"
+                                    (click)="invoiceRowClick(element)"
+                                >
+                                    {{ element.CARRIER }}
+                                </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="VEHICLE_CAPACITY">
+                                <th
+                                    [hidden]="isColumnHide('VEHICLE_CAPACITY')"
+                                    mat-header-cell
+                                    *matHeaderCellDef
+                                    mat-sort-header
+                                >
+                                    Vehicle Capacity
+                                </th>
+                                <td
+                                    [hidden]="isColumnHide('VEHICLE_CAPACITY')"
+                                    mat-cell
+                                    *matCellDef="let element"
+                                    (click)="invoiceRowClick(element)"
+                                >
+                                    {{ element.VEHICLE_CAPACITY }}
+                                </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="GROSS_WEIGHT">
+                                <th
+                                    [hidden]="isColumnHide('GROSS_WEIGHT')"
+                                    mat-header-cell
+                                    *matHeaderCellDef
+                                    mat-sort-header
+                                >
+                                    Gross Weight
+                                </th>
+                                <td
+                                    [hidden]="isColumnHide('GROSS_WEIGHT')"
+                                    mat-cell
+                                    *matCellDef="let element"
+                                    (click)="invoiceRowClick(element)"
+                                >
+                                    {{ element.GROSS_WEIGHT }}
+                                </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="EWAYBILL_NO">
+                                <th
+                                    [hidden]="isColumnHide('EWAYBILL_NO')"
+                                    mat-header-cell
+                                    *matHeaderCellDef
+                                    mat-sort-header
+                                >
+                                    E-way bill No
+                                </th>
+                                <td
+                                    [hidden]="isColumnHide('EWAYBILL_NO')"
+                                    mat-cell
+                                    *matCellDef="let element"
+                                    (click)="invoiceRowClick(element)"
+                                >
+                                    {{ element.EWAYBILL_NO }}
+                                </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="EWAYBILL_DATE">
+                                <th
+                                    [hidden]="isColumnHide('EWAYBILL_DATE')"
+                                    mat-header-cell
+                                    *matHeaderCellDef
+                                    mat-sort-header
+                                >
+                                    E-way bill No Date
+                                </th>
+                                <td
+                                    [hidden]="isColumnHide('EWAYBILL_DATE')"
+                                    mat-cell
+                                    *matCellDef="let element"
+                                    (click)="invoiceRowClick(element)"
+                                >
+                                    {{
+                                        element.EWAYBILL_DATE
+                                            | date : "dd/MM/yyyy"
+                                    }}
+                                </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="FREIGHT_ORDER">
+                                <th
+                                    [hidden]="isColumnHide('FREIGHT_ORDER')"
+                                    mat-header-cell
+                                    *matHeaderCellDef
+                                    mat-sort-header
+                                >
+                                    Freight Order
+                                </th>
+                                <td
+                                    [hidden]="isColumnHide('FREIGHT_ORDER')"
+                                    mat-cell
+                                    *matCellDef="let element"
+                                    (click)="invoiceRowClick(element)"
+                                >
+                                    {{ element.FREIGHT_ORDER }}
+                                </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="FREIGHT_ORDER_DATE">
+                                <th
+                                    [hidden]="
+                                        isColumnHide('FREIGHT_ORDER_DATE')
+                                    "
+                                    mat-header-cell
+                                    *matHeaderCellDef
+                                    mat-sort-header
+                                >
+                                    Freight Order Date
+                                </th>
+                                <td
+                                    [hidden]="
+                                        isColumnHide('FREIGHT_ORDER_DATE')
+                                    "
+                                    mat-cell
+                                    *matCellDef="let element"
+                                    (click)="invoiceRowClick(element)"
+                                >
+                                    {{
+                                        element.FREIGHT_ORDER_DATE
+                                            | date : "dd/MM/yyyy"
+                                    }}
+                                </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="PROPOSED_DELIVERY_DATE">
+                                <th
+                                    [hidden]="
+                                        isColumnHide('PROPOSED_DELIVERY_DATE')
+                                    "
+                                    mat-header-cell
+                                    *matHeaderCellDef
+                                    mat-sort-header
+                                >
+                                    Proposed delivery Date
+                                </th>
+                                <td
+                                    [hidden]="
+                                        isColumnHide('PROPOSED_DELIVERY_DATE')
+                                    "
+                                    mat-cell
+                                    *matCellDef="let element"
+                                    (click)="invoiceRowClick(element)"
+                                >
+                                    {{
+                                        element.PROPOSED_DELIVERY_DATE
+                                            | date : "dd/MM/yyyy"
+                                    }}
+                                </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="ACTUAL_DELIVERY_DATE">
+                                <th
+                                    [hidden]="
+                                        isColumnHide('ACTUAL_DELIVERY_DATE')
+                                    "
+                                    mat-header-cell
+                                    *matHeaderCellDef
+                                    mat-sort-header
+                                >
+                                    Acknowledgement Date
+                                </th>
+                                <td
+                                    [hidden]="
+                                        isColumnHide('ACTUAL_DELIVERY_DATE')
+                                    "
+                                    mat-cell
+                                    *matCellDef="let element"
+                                    (click)="invoiceRowClick(element)"
+                                >
+                                    {{
+                                        element.ACTUAL_DELIVERY_DATE
+                                            | date : "dd/MM/yyyy h:mm:ss a"
+                                    }}
+                                </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="TRANSIT_LEAD_TIME">
+                                <th
+                                    [hidden]="isColumnHide('TRANSIT_LEAD_TIME')"
+                                    mat-header-cell
+                                    *matHeaderCellDef
+                                    mat-sort-header
+                                >
+                                    Lead time
+                                </th>
+                                <td
+                                    [hidden]="isColumnHide('TRANSIT_LEAD_TIME')"
+                                    mat-cell
+                                    *matCellDef="let element"
+                                    (click)="invoiceRowClick(element)"
+                                >
+                                    {{ element.TRANSIT_LEAD_TIME }}
+                                </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="STATUS">
+                                <th
+                                    [hidden]="isColumnHide('STATUS')"
+                                    mat-header-cell
+                                    *matHeaderCellDef
+                                    mat-sort-header
+                                >
+                                    Status
+                                </th>
+                                <td
+                                    [hidden]="isColumnHide('STATUS')"
+                                    mat-cell
+                                    *matCellDef="let element"
+                                    (click)="invoiceRowClick(element)"
+                                >
+                                    {{ element.STATUS }}
+                                </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="CHANGESTATUS">
+                                <th mat-header-cell *matHeaderCellDef>
+                                    Change
+                                </th>
+                                <td mat-cell *matCellDef="let element">
+                                    <button
+                                        *ngIf="
+                                            (currentUserRole | lowercase) ===
+                                                'administrator' ||
+                                            (
+                                                currentUserRole | lowercase
+                                            ).includes('coordinator')
+                                        "
+                                        mat-raised-button
+                                        class="mr-4 btnBg"
+                                        (click)="
+                                            UpdateInvoiceStatus(
+                                                element.STATUS,
+                                                element.HEADER_ID
+                                            )
+                                        "
+                                    >
+                                        Change to save
+                                    </button>
+                                </td>
+                            </ng-container>
+
+                            <tr
+                                mat-header-row
+                                *matHeaderRowDef="
+                                    displayedColumns;
+                                    sticky: true
+                                "
+                            ></tr>
+                            <tr
+                                mat-row
+                                *matRowDef="let row; columns: displayedColumns"
+                                style="cursor: pointer"
+                            ></tr>
+                        </table>
+                        <div *ngIf="!FilteredInvoiceDetails?.length">
+                            <mat-icon
+                                svgIcon="infoIcon"
+                                style="
+                                    color: #1b56ca;
+                                    margin-top: 10px;
+                                    margin-left: 70px;
+                                "
+                            ></mat-icon>
+                            <span style="margin-left: 10px"
+                                >The table does not contain any data</span
+                            >
+                        </div>
+                        <div flex>
+                            <mat-paginator
+                                [pageSizeOptions]="[
+                                    5, 10, 25, 50, 100, 200, 500, 1000
+                                ]"
+                                showFirstLastButtons
+                            >
+                            </mat-paginator>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <mat-progress-spinner
+        *ngIf="isProgressBarVisibile"
+        class="progressBarPostion"
+        color="accent"
+        mode="indeterminate"
+    >
+    </mat-progress-spinner>
+    <div id="overlay" *ngIf="isProgressBarVisibile"></div>
+</div>

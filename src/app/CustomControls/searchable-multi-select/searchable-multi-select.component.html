@@ -1,0 +1,15 @@
+<mat-form-field fxFlex="100" >
+  <mat-label>Customer Group</mat-label>                
+  <mat-select   [formControl]="CustomerGroupFormGroup" multiple>
+      <mat-form-field style="width: 100%;padding: 1%;" appearance="fill">
+          <mat-label>Search</mat-label>
+          <input matInput  [formControl]="CustomerGroupChanged">
+        </mat-form-field>
+      <mat-option #allSelected (click)="toggleAllSelection()" value="all">
+          All
+      </mat-option>
+    <mat-option (click)="toggleCustomerGrpPerOne()" *ngFor="let cg of FilteredCustomerGroups"  [value]="cg.CustomerGroupCode" [style.display]="checkFilteredCustomerGroup(cg.CustomerGroupCode) ? 'flex':'none'">
+      {{cg.CustomerGroupCode}}
+    </mat-option>
+  </mat-select>
+</mat-form-field>

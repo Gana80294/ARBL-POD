@@ -1,0 +1,72 @@
+<div id="lr" class="page-layout carded fullwidth inner-scroll">
+  <div class="top-bg topBg"></div>
+  <div class="center normal">
+    <div class="m-12 p-0 content-card" fxLayout>
+
+      <div fxFlex class="organization-side-bar">
+        <div class="sidenav-content" fusePerfectScrollbar fxFlex fxLayout="row">
+          <form fxFlex class="p-24 normal" autocomplete="off" fxLayout="column" (keydown.enter)="SaveClicked('number')"
+            fxLayoutAlign="start" name="form" [formGroup]="UpdateLRNumberFormGroup">
+            <div fxLayout="row" class="pt-8">
+              <div fxFlex class="h2 mb-24">Update LR Number</div>
+            </div>
+            <div fxLayout="row wrap" fxLayoutAlign="start">
+              <mat-form-field fxFlex>
+                <input matInput placeholder="Invoice Number" formControlName="InvoiceNo" (keypress)="decimalOnly($event)">
+                <mat-error
+                  *ngIf="UpdateLRNumberFormGroup.get('InvoiceNo').touched && UpdateLRNumberFormGroup.get('InvoiceNo').hasError('required')">
+                  Invoice Number is required</mat-error>
+              </mat-form-field>
+            </div>
+            <div fxLayout="row wrap" fxLayoutAlign="start">
+              <mat-form-field fxFlex>
+                <input matInput placeholder="LR Number" formControlName="LRNumber">
+                <mat-error
+                  *ngIf="UpdateLRNumberFormGroup.get('LRNumber').touched && UpdateLRNumberFormGroup.get('LRNumber').hasError('required')">
+                  LR Number is required</mat-error>
+              </mat-form-field>
+            </div>
+            <div fxLayout="row wrap" fxLayoutAlign="center">
+              <button mat-raised-button class="btnBg" type="button" (click)="SaveClicked('number')">
+                Update
+              </button>
+            </div>
+          </form>
+          <form fxFlex class="p-24 normal" autocomplete="off" fxLayout="column" (keydown.enter)="SaveClicked('date')"
+            fxLayoutAlign="start" name="form" [formGroup]="UpdateLRFormGroup">
+            <div fxLayout="row" class="pt-8">
+              <div fxFlex class="h2 mb-24">Update LR Date</div>
+            </div>
+            <div fxLayout="row wrap" fxLayoutAlign="start">
+              <mat-form-field fxFlex>
+                <input matInput placeholder="Invoice Number" formControlName="InvoiceNo" (keypress)="decimalOnly($event)">
+                <mat-error
+                  *ngIf="UpdateLRFormGroup.get('InvoiceNo').touched && UpdateLRFormGroup.get('InvoiceNo').hasError('required')">
+                  Invoice Number is required</mat-error>
+              </mat-form-field>
+            </div>
+            <div fxLayout="row wrap" fxLayoutAlign="start">
+              <mat-form-field fxFlex>
+                <input matInput [matDatepicker]="picker" placeholder="LR Date" formControlName="LRDate" (focus)="picker.open()">
+                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+                <mat-error
+                  *ngIf="UpdateLRFormGroup.get('LRDate').touched && UpdateLRFormGroup.get('LRDate').hasError('required')">
+                  LR Date is required</mat-error>
+              </mat-form-field>
+            </div>
+            <div fxLayout="row wrap" fxLayoutAlign="center">
+              <button mat-raised-button class="btnBg" type="button" (click)="SaveClicked('date')">
+                Update
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div fxFlex="1"></div>
+    </div>
+  </div>
+  <mat-progress-spinner *ngIf="IsProgressBarVisibile" class="ProgressBarPostion1" color="accent" mode="indeterminate">
+  </mat-progress-spinner>
+  <div id="overlay" *ngIf="IsProgressBarVisibile"></div>
+</div>

@@ -1,0 +1,26 @@
+<div class="dialog-content-wrapper">
+  <mat-toolbar class="toolBg m-0">
+      <mat-toolbar-row fxFlex fxLayout="row" fxLayoutAlign="space-between center">
+          <span class="title dialog-title">Select the Fields to be displayed.</span>
+          <button mat-icon-button (click)="dialogRef.close(null)" aria-label="Close dialog">
+              <mat-icon svgIcon="closeIcon"></mat-icon>
+          </button>
+      </mat-toolbar-row>
+  </mat-toolbar>
+
+  <mat-dialog-content class="p-24 m-0" fusePerfectScrollbar>
+      
+      <form [formGroup]="TableColumnsFormGroup">
+       <div formArrayName="specifiedColumns" *ngFor="let column of columnsFormArray.controls; let i = index">
+        <mat-checkbox [formControlName]="i" >
+            {{displayedColumns[i]}}
+        </mat-checkbox>
+       </div>
+      </form>
+  </mat-dialog-content>
+  <mat-dialog-actions class="m-0 p-16" fxLayoutAlign="space-between center" align="end">
+      <button mat-button type="button" style="background-color: red; color: white;" (click)="ClearSelected()">Clear All</button>
+      <button mat-button type="button" style="background-color: rgb(0, 102, 255); color: white;" (click)="SelectAllClicked()">Select All</button>
+      <button mat-button type="button" style="background-color: rgb(29, 161, 2); color: white;" class="btnBg" (click)="YesClicked()">Get</button>
+  </mat-dialog-actions>
+</div>

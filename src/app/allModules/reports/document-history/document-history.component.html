@@ -1,0 +1,81 @@
+<div id="document-history" class="page-layout carded fullwidth inner-scroll">
+  <div class="top-bg topBg"></div>
+  <div class="center normal">
+    <div class="m-12 p-0 content-card" fxLayout>
+
+      <div fxFlex class="organization-side-bar">
+        <div class="sidenav-content" fusePerfectScrollbar fxFlex fxLayout="column">
+          <form class="p-24 normal" autocomplete="off" fxLayout="column" (keydown.enter)="SearchClicked()"
+            fxLayoutAlign="start" name="form" [formGroup]="SearchFormGroup">
+            <div fxLayout="row" class="pt-8">
+              <div fxFlex class="h2 mb-24">Document History</div>
+            </div>
+            <div fxLayout="row wrap" fxLayoutAlign="start">
+              <mat-form-field fxFlex>
+                <input matInput placeholder="Invoice Number" formControlName="InvoiceNo" (keypress)="decimalOnly($event)">
+                <mat-error
+                  *ngIf="SearchFormGroup.get('InvoiceNo').touched && SearchFormGroup.get('InvoiceNo').hasError('required')">
+                  Invoice Number is required</mat-error>
+              </mat-form-field>
+            </div>
+            <div fxLayout="row wrap" fxLayoutAlign="center">
+              <button mat-raised-button class="btnBg" type="button" (click)="SearchClicked()">
+                Search
+              </button>
+            </div>
+          </form>
+          <div class="example-container p-16">
+            <table class="table" mat-table [dataSource]="dataSource">
+  
+              <ng-container matColumnDef="FileName">
+                <th mat-header-cell *matHeaderCellDef> Document </th>
+                <td mat-cell *matCellDef="let element;let index=index;">
+                  {{element.FileName}}
+                </td>
+              </ng-container>
+  
+              <ng-container matColumnDef="CreatedOn">
+                <th mat-header-cell *matHeaderCellDef> Uploaded On </th>
+                <td mat-cell *matCellDef="let element;let index=index;">
+                  {{element.CreatedOn | date :'dd/MM/yyyy hh:mm:ss'}}
+                </td>
+              </ng-container>
+  
+              <ng-container matColumnDef="CreatedBy">
+                <th mat-header-cell *matHeaderCellDef> Uploaded By </th>
+                <td mat-cell *matCellDef="let element;let index=index;">
+                  {{element.CreatedBy}}
+                </td>
+              </ng-container>
+  
+              <ng-container matColumnDef="Action">
+                <th mat-header-cell *matHeaderCellDef> Action </th>
+                <td mat-cell *matCellDef="let element;let index=index;">
+                  <div fxLayout="row" fxLayoutGap="16px">
+                    <mat-icon svgIcon="photoIcon" matTooltip="view attachment" aria-label="view_file" style="cursor: pointer;"
+                        (click)="DowloandHistoryDocument(element.Id,element.FileName)">
+                      </mat-icon>
+                      <mat-icon svgIcon="arrowDownwardIcon" matTooltip="download attachment" aria-label="file_download" style="cursor: pointer;"
+                      (click)="DowloandHistoryDocument(element.Id,element.FileName,true)">
+                    </mat-icon>
+                  </div>
+                </td>
+              </ng-container>
+  
+              <tr mat-header-row *matHeaderRowDef="displayedColumns;sticky: true"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;let index=index;"></tr>
+            </table>
+            <div *ngIf="!dataSource.data.length">
+              <mat-icon svgIcon="infoIcon" style="color: #1b56ca;margin-top: 10px;margin-left: 70px"></mat-icon>
+              <span style="margin-left: 10px;">The table does not contain any data</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div fxFlex="1"></div>
+    </div>
+  </div>
+  <mat-progress-spinner *ngIf="IsProgressBarVisibile" class="ProgressBarPostion1" color="accent" mode="indeterminate">
+  </mat-progress-spinner>
+  <div id="overlay" *ngIf="IsProgressBarVisibile"></div>
+</div>

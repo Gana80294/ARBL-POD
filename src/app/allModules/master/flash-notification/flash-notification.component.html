@@ -1,0 +1,60 @@
+<div id="flash-notification" class="page-layout carded fullwidth inner-scroll">
+  <div class="top-bg topBg"></div>
+  <div class="center normal">
+    <div class="m-12 p-0 content-card" fxLayout>
+
+      <div fxFlex class="organization-side-bar">
+        <div class="sidenav-content" fusePerfectScrollbar fxFlex fxLayout="row">
+          <form fxFlex="50" class="p-24 normal" autocomplete="off" fxLayout="column" (keydown.enter)="SaveClicked('1')"
+            fxLayoutAlign="start" name="form" [formGroup]="NotificationFormGroup">
+            <div fxLayout="row" class="pt-8">
+              <div fxFlex class="h2 mb-24">Regular EPOD Message</div>
+            </div>
+            <div fxLayout="row wrap" fxLayoutAlign="start">
+              <mat-form-field fxFlex>
+                <textarea matInput placeholder="Message" formControlName="Message"></textarea>
+                <mat-error
+                  *ngIf="NotificationFormGroup.get('Message').touched && NotificationFormGroup.get('Message').hasError('required')">
+                  Message is required</mat-error>
+              </mat-form-field>
+            </div>
+            <div fxLayout="row wrap" fxLayoutAlign="start">
+              <p><mat-checkbox formControlName="IsActive">Enable</mat-checkbox></p>
+            </div>
+            <div fxLayout="row wrap" fxLayoutAlign="center">
+              <button mat-raised-button class="btnBg" type="button" (click)="SaveClicked('1')">
+                Update
+              </button>
+            </div>
+          </form>
+          <form fxFlex="50" class="p-24 normal" autocomplete="off" fxLayout="column" (keydown.enter)="SaveClicked('2')"
+            fxLayoutAlign="start" name="form" [formGroup]="ReverseLogisticsNotificationFormGroup">
+            <div fxLayout="row" class="pt-8">
+              <div fxFlex class="h2 mb-24">Reverse Logistics Message</div>
+            </div>
+            <div fxLayout="row wrap" fxLayoutAlign="start">
+              <mat-form-field fxFlex>
+                <textarea matInput placeholder="Message" formControlName="Message"></textarea>
+                <mat-error
+                  *ngIf="ReverseLogisticsNotificationFormGroup.get('Message').touched && ReverseLogisticsNotificationFormGroup.get('Message').hasError('required')">
+                  Message is required</mat-error>
+              </mat-form-field>
+            </div>
+            <div fxLayout="row wrap" fxLayoutAlign="start">
+              <p><mat-checkbox formControlName="IsActive">Enable</mat-checkbox></p>
+            </div>
+            <div fxLayout="row wrap" fxLayoutAlign="center">
+              <button mat-raised-button class="btnBg" type="button" (click)="SaveClicked('2')">
+                Update
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div fxFlex="1"></div>
+    </div>
+  </div>
+  <mat-progress-spinner *ngIf="IsProgressBarVisibile" class="ProgressBarPostion1" color="accent" mode="indeterminate">
+  </mat-progress-spinner>
+  <div id="overlay" *ngIf="IsProgressBarVisibile"></div>
+</div>
