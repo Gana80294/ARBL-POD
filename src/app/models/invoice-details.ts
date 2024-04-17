@@ -310,9 +310,9 @@ export class ReversePodUpdation {
     RPOD_HEADER_ID: number;
     Status: number;
     DC_RECEIEVED_DATE: Date | string | null;
-    DC_ACKNOWLEDGEMENT_DATE: Date | null;
+    DC_ACKNOWLEDGEMENT_DATE: Date | string | null;
     STATUS: string;
-    MATERIALS: ReversePodItemUpdation[];
+    MATERIALS: ReversePodItemUpdation[] =[];
 }
 
 export class ReversePodItemUpdation {
