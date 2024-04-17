@@ -111,7 +111,7 @@ export class ReverseLogisticsComponent implements OnInit {
         // "DC_Pending_Quantity",
         "DC_Received_Date",
         "DC_Acknowledgement_Date",
-        "Received_Status",
+        "Status",
         "DCLR",
         "PENDING_DAYS",
         // "Remarks",
@@ -482,16 +482,16 @@ export class ReverseLogisticsComponent implements OnInit {
         if (this.FilteredRpodDetails) {
             data = [
                 this.FilteredRpodDetails.filter(
-                    (x) => x.RECEIVED_STATUS == "Open"
+                    (x) => x.STATUS == "Open"
                 ).length,
                 this.FilteredRpodDetails.filter(
-                    (x) => x.RECEIVED_STATUS == "In Transit"
+                    (x) => x.STATUS == "In Transit"
                 ).length,
                 this.FilteredRpodDetails.filter(
-                    (x) => x.RECEIVED_STATUS == "Partially Confirmed"
+                    (x) => x.STATUS == "Partially Confirmed"
                 ).length,
                 this.FilteredRpodDetails.filter(
-                    (x) => x.RECEIVED_STATUS == "Confirmed"
+                    (x) => x.STATUS == "Confirmed"
                 ).length,
             ];
         }

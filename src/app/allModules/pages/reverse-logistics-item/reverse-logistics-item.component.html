@@ -6,20 +6,10 @@
           <b>Reverse Logistics Item Details</b>
         </div>
         <div fxFlex fxLayoutAlign="end">
-
-          <!-- Customer confirm btn -->
+          <!-- Confirm btn -->
           <button *ngIf="
-                          (currentUserRole | lowercase) === 'customer' && 
-                          (selectedReverseLogisticDetail.STATUS | lowercase) ==='open'" 
-                          mat-raised-button class="mr-4 confirmBtn" (click)="confirmReversePOD()">
-            Confirm
-          </button>
-
-          <!-- amararaja user confirm btn -->
-          <button *ngIf="
-                          (currentUserRole | lowercase) === 'amararaja user' &&
-                          !selectedReverseLogisticDetail?.STATUS.toLowerCase().includes('confirmed')" 
-                          mat-raised-button class="mr-4 confirmBtn" (click)="ConfirmWithoutAttachment()">
+                          !selectedReverseLogisticDetail?.STATUS.toLowerCase().includes('confirmed')" mat-raised-button
+            class="mr-4 confirmBtn" (click)="confirmReversePOD()">
             Confirm
           </button>
 
@@ -27,19 +17,18 @@
           <button *ngIf="
                           (currentUserRole | lowercase) === 'amararaja user' &&
                           (selectedReverseLogisticDetail?.STATUS | lowercase) === 'partially confirmed'"
-                          mat-raised-button class="mr-4 confirmBtn">
+            mat-raised-button class="mr-4 confirmBtn">
             Confirm Qty
           </button>
 
-          <input hidden onclick="this.value=null" type="file"
-                                    accept="application/pdf,image/jpg,image/jpeg,.png,image/*" #reversePodFileInput
-                                    id="reversePodFile" (change)="handleFileInput($event)" />
+          <input hidden onclick="this.value=null" type="file" accept="application/pdf,image/jpg,image/jpeg,.png,image/*"
+            #reversePodFileInput id="reversePodFile" (change)="handleFileInput($event)" />
         </div>
       </div>
     </mat-card>
     <div class="sidenav-content">
       <form autocomplete="off" name="form" [formGroup]="reverseLogisticsItemFormGroup" fxLayout="column"
-        fxLayoutAlign="start" fxFlex="1 0 auto" novalidate class="abnormal" id="abnormal">
+        fxLayoutAlign="start" fxFlex="100" novalidate class="abnormal" id="abnormal">
         <!-- <div class="m-0 p-0 mr-8"> -->
         <div fxFlex fxLayout="row" class="borderTop mt-4">
           <table class="customtable">
@@ -69,8 +58,7 @@
                     <input matInput type="text" formControlName="LR_NO" />
                   </mat-form-field>
                   <mat-error *ngIf="reverseLogisticsItemFormGroup.get('LR_NO').touched &&
-                  reverseLogisticsItemFormGroup.get('LR_NO').hasError('required')" 
-                  class="mat-err-msg">
+                  reverseLogisticsItemFormGroup.get('LR_NO').hasError('required')" class="mat-err-msg">
                     Required
                   </mat-error>
                 </td>
@@ -81,10 +69,9 @@
                     <mat-datepicker-toggle matSuffix [for]="pickerLrDate">
                     </mat-datepicker-toggle>
                     <mat-datepicker #pickerLrDate></mat-datepicker>
-                    </mat-form-field>
-                    <mat-error *ngIf="reverseLogisticsItemFormGroup.get('LR_DATE').touched &&
-                  reverseLogisticsItemFormGroup.get('LR_DATE').hasError('required')"
-                  class="mat-err-msg">
+                  </mat-form-field>
+                  <mat-error *ngIf="reverseLogisticsItemFormGroup.get('LR_DATE').touched &&
+                  reverseLogisticsItemFormGroup.get('LR_DATE').hasError('required')" class="mat-err-msg">
                     Required
                   </mat-error>
                 </td>
@@ -96,6 +83,10 @@
                     </mat-datepicker-toggle>
                     <mat-datepicker #pickerdcReceDate></mat-datepicker>
                   </mat-form-field>
+                  <mat-error *ngIf="reverseLogisticsItemFormGroup.get('DC_RECEIEVED_DATE').touched &&
+                  reverseLogisticsItemFormGroup.get('DC_RECEIEVED_DATE').hasError('required')" class="pl-8 mat-err-msg">
+                    Required
+                  </mat-error>
                 </td>
                 <td>{{ selectedReverseLogisticDetail?.DC_ACKNOWLEDGEMENT_DATE }}</td>
                 <td>{{selectedReverseLogisticDetail?.STATUS}}</td>
@@ -168,15 +159,14 @@
                 <th mat-header-cell *matHeaderCellDef>Received Quantity</th>
                 <td mat-cell *matCellDef="let element; let index = index" [formGroupName]="index">
                   <mat-form-field appearance="outline">
-                    <input matInput type="number" #receivedQty formControlName="RECEIVED_QUANTITY"
-                      (input)="receivedQtyValidation($event,reverseLogisticsItemFormGroup.get('RPodItemArray')['controls'][index]?.get(
+                    <input matInput type="number" #receivedQty formControlName="RECEIVED_QUANTITY" (input)="receivedQtyValidation($event,reverseLogisticsItemFormGroup.get('RPodItemArray')['controls'][index]?.get(
                         'HAND_OVERED_QUANTITY'
-                    )?.value, index)" />
+                    )?.value, element.QUANTITY,index)" />
                   </mat-form-field>
                   <mat-error *ngIf="reverseLogisticsItemFormGroup.get('RPodItemArray')['controls'][index]?.get(
                     'HAND_OVERED_QUANTITY'
                 )?.value < receivedQty.value" class="mat-err-msg">
-                    Received Qty is higher than the Actual Qty
+                    Received Qty is higher than the Hand overed Qty
                   </mat-error>
                   <mat-error *ngIf="reverseLogisticsItemFormGroup.get('RPodItemArray')['controls'][index]?.get(
                           'RECEIVED_QUANTITY'
@@ -189,7 +179,7 @@
                   <mat-error *ngIf="receivedQty.value < 0" class="mat-err-msg">
                     Value can't be negative
                   </mat-error>
-                  
+
                 </td>
               </ng-container>
 

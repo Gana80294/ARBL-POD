@@ -561,11 +561,6 @@ export class DeliveryChallansComponent implements OnInit {
             this.selectedIndex = ind;
             const el: HTMLElement = this.fileInput.nativeElement;
             el.click();
-
-            const FORMDATA = new FormData();
-
-
-
         } else {
             let msg = this.currentUserRole == 'Customer' ?
                 'Please fill LR No & LR Date' : 'Please fill LR No, LR Date and DC Received Date';
@@ -576,12 +571,6 @@ export class DeliveryChallansComponent implements OnInit {
         }
     }
     confirmRpod() {
-        const RpodDetailsFormArray = this.RpodDetailsFormGroup.get(
-            "RpodDetails"
-        ) as FormArray;
-        let selectedRowValue =
-            RpodDetailsFormArray.controls[this.selectedIndex].value;
-
         let payLoad = new ReversePodUpdation();
         const RpodFormArray = this.RpodDetailsFormGroup.get(
             "RpodDetails"
@@ -602,10 +591,7 @@ export class DeliveryChallansComponent implements OnInit {
             this.FilteredRpodDetails[this.selectedIndex].DC_ACKNOWLEDGEMENT_DATE;
         payLoad.STATUS =
             this.FilteredRpodDetails[this.selectedIndex].STATUS;
-
-        
-
-        console.log(payLoad);
+        console.log('p',payLoad);
 
         const FORMDATA: FormData = new FormData();
 
@@ -615,15 +601,19 @@ export class DeliveryChallansComponent implements OnInit {
             });
             FORMDATA.append("Payload", JSON.stringify(payLoad));
         }
-        this.isProgressBarVisibile = true;
-        this._reversePod.confirmReversePod(FORMDATA).subscribe({
-            next: (res) => {
-
-            },
-            error: (err) => {
-
-            }
-        });
+        console.log(FORMDATA);
+        // this.isProgressBarVisibile = true;
+        // this._reversePod.confirmReversePod(FORMDATA).subscribe({
+        //     next: (res) => {
+                // if(res){
+                //     this.isProgressBarVisibile = false;
+                // }
+        //     },
+        //     error: (err) => {
+                //     this.isProgressBarVisibile = false;
+        //     }
+        // });
+        //     this.isProgressBarVisibile = false;
     }
 
     handleFileInput(evt) {
@@ -635,13 +625,13 @@ export class DeliveryChallansComponent implements OnInit {
                 this.fileToUploadList = [];
                 this.fileToUploadList.push(evt.target.files[0]);
                 this.confirmRpod();
-                if (this.authenticationDetails.userRole == "Customer") {
-                    this.confirmByCustomer();
-                } else if (
-                    this.authenticationDetails.userRole == "Amararaja User"
-                ) {
-                    this.confirmByDC();
-                }
+                // if (this.authenticationDetails.userRole == "Customer") {
+                //     this.confirmByCustomer();
+                // } else if (
+                //     this.authenticationDetails.userRole == "Amararaja User"
+                // ) {
+                //     this.confirmByDC();
+                // }
             } else {
                 this.notificationSnackBarComponent.openSnackBar(
                     "Please upload file size below 5 MB",
