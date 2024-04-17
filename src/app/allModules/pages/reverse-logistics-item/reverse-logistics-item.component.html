@@ -28,7 +28,7 @@
     </mat-card>
     <div class="sidenav-content">
       <form autocomplete="off" name="form" [formGroup]="reverseLogisticsItemFormGroup" fxLayout="column"
-        fxLayoutAlign="start" fxFlex="1 0 auto" novalidate class="abnormal" id="abnormal">
+        fxLayoutAlign="start" fxFlex="100" novalidate class="abnormal" id="abnormal">
         <!-- <div class="m-0 p-0 mr-8"> -->
         <div fxFlex fxLayout="row" class="borderTop mt-4">
           <table class="customtable">
@@ -83,6 +83,10 @@
                     </mat-datepicker-toggle>
                     <mat-datepicker #pickerdcReceDate></mat-datepicker>
                   </mat-form-field>
+                  <mat-error *ngIf="reverseLogisticsItemFormGroup.get('DC_RECEIEVED_DATE').touched &&
+                  reverseLogisticsItemFormGroup.get('DC_RECEIEVED_DATE').hasError('required')" class="pl-8 mat-err-msg">
+                    Required
+                  </mat-error>
                 </td>
                 <td>{{ selectedReverseLogisticDetail?.DC_ACKNOWLEDGEMENT_DATE }}</td>
                 <td>{{selectedReverseLogisticDetail?.STATUS}}</td>
@@ -157,12 +161,12 @@
                   <mat-form-field appearance="outline">
                     <input matInput type="number" #receivedQty formControlName="RECEIVED_QUANTITY" (input)="receivedQtyValidation($event,reverseLogisticsItemFormGroup.get('RPodItemArray')['controls'][index]?.get(
                         'HAND_OVERED_QUANTITY'
-                    )?.value, index)" />
+                    )?.value, element.QUANTITY,index)" />
                   </mat-form-field>
                   <mat-error *ngIf="reverseLogisticsItemFormGroup.get('RPodItemArray')['controls'][index]?.get(
                     'HAND_OVERED_QUANTITY'
                 )?.value < receivedQty.value" class="mat-err-msg">
-                    Received Qty is higher than the Actual Qty
+                    Received Qty is higher than the Hand overed Qty
                   </mat-error>
                   <mat-error *ngIf="reverseLogisticsItemFormGroup.get('RPodItemArray')['controls'][index]?.get(
                           'RECEIVED_QUANTITY'

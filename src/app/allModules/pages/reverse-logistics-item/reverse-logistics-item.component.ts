@@ -128,11 +128,14 @@ export class ReverseLogisticsItemComponent implements OnInit {
     this.reverseLogisticsItemFormGroup = this._formBuilder.group({
       LR_NO: ['', [Validators.required]],
       LR_DATE: ['', [Validators.required]],
-      DC_RECEIEVED_DATE: [''],
+      DC_RECEIEVED_DATE: ['', [Validators.required]],
       RPodItemArray: this._formBuilder.array([])
     });
 
     this.selectedReverseLogisticDetail = this._shareParameterService.getReverseLogisticDetail();
+    if(!this.selectedReverseLogisticDetail){
+      this._router.navigate(['pages/deliverychallan']);
+    }
 
     //get material details api call
     this.getReversePodMaterialDetails(this.selectedReverseLogisticDetail.RPOD_HEADER_ID);
@@ -1303,12 +1306,13 @@ export class ReverseLogisticsItemComponent implements OnInit {
     }
     this.dataSource._updateChangeSubscription();
   }
-  receivedQtyValidation(event, qty: number, index: number) {
+  receivedQtyValidation(event, hqty: number, actualQty: number, index: number) {
     let receivedQty = event.target.value
 
-    if (receivedQty == qty) {
+    if (receivedQty == hqty && hqty == actualQty) {
       this.dataSource.data[index].STATUS = 'Confirmed';
-    } else if (receivedQty < qty) {
+    }
+    if (receivedQty < hqty || hqty < actualQty) {
       this.dataSource.data[index].STATUS = 'Partially Confirmed';
     }
     this.dataSource._updateChangeSubscription();
@@ -1347,19 +1351,25 @@ export class ReverseLogisticsItemComponent implements OnInit {
       if (this.dataSource.data[i].QUANTITY < rPOdFormArray[i].value.HAND_OVERED_QUANTITY) {
         return false;
       }
-      if (rPOdFormArray[i].value.HAND_OVERED_QUANTITY < 0) {
+      else if (rPOdFormArray[i].value.HAND_OVERED_QUANTITY < 0) {
         return false;
       }
+      else if (this.currentUserRole != 'Customer' && (rPOdFormArray[i].value.HAND_OVERED_QUANTITY < rPOdFormArray[i].value.RECEIVED_QUANTITY)) {
+        return false;
+      }
+      else if (rPOdFormArray[i].value.RECEIVED_QUANTITY < 0) {
+        return false;
+      }
+      else {
+        return true;
+      }
     }
-
-    return true;
   }
 
 
   ShowValidationErrors(formGroup: FormGroup): void {
     Object.keys(formGroup.controls).forEach((key) => {
       if (!formGroup.get(key).valid) {
-        console.log(key);
       }
       formGroup.get(key).markAsTouched();
       formGroup.get(key).markAsDirty();
@@ -1389,12 +1399,12 @@ export class ReverseLogisticsItemComponent implements OnInit {
   confirmRpod() {
 
     let payLoad = new ReversePodUpdation();
-  
+
     payLoad.RPOD_HEADER_ID =
       this.selectedReverseLogisticDetail.RPOD_HEADER_ID;
-      payLoad.LR_NO = this.reverseLogisticsItemFormGroup.value['LR_NO'];
-      payLoad.LR_DATE = this.reverseLogisticsItemFormGroup.value['LR_DATE'];
-      payLoad.DC_RECEIEVED_DATE  = this.reverseLogisticsItemFormGroup.get('DC_RECEIEVED_DATE').value;
+    payLoad.LR_NO = this.reverseLogisticsItemFormGroup.value['LR_NO'];
+    payLoad.LR_DATE = this.reverseLogisticsItemFormGroup.value['LR_DATE'];
+    payLoad.DC_RECEIEVED_DATE = this.reverseLogisticsItemFormGroup.get('DC_RECEIEVED_DATE').value;
     payLoad.LR_DATE = this._datePipe.transform(
       payLoad.LR_DATE,
       "yyyy-MM-dd HH:mm:ss"
@@ -1426,7 +1436,6 @@ export class ReverseLogisticsItemComponent implements OnInit {
       payLoad.MATERIALS.push(rpodItem);
     });
 
-    console.log('p', payLoad);
 
     const FORMDATA: FormData = new FormData();
 
@@ -1436,19 +1445,21 @@ export class ReverseLogisticsItemComponent implements OnInit {
       });
       FORMDATA.append("Payload", JSON.stringify(payLoad));
     }
-    console.log(FORMDATA);
-    // this.isProgressBarVisibile = true;
-    // this._reversePod.confirmReversePod(FORMDATA).subscribe({
-    //     next: (res) => {
-    // if(res){
-    //     this.isProgressBarVisibile = false;
-    // }
-    //     },
-    //     error: (err) => {
-    //     this.isProgressBarVisibile = false;
-    //     }
-    // });
-    //     this.isProgressBarVisibile = false;
+    this.isProgressBarVisibile = true;
+    this._reversePodService.confirmReversePod(FORMDATA).subscribe({
+      next: (res) => {
+        this.isProgressBarVisibile = false;
+        this._router.navigate(['pages/deliverychallan']);
+      },
+      error: (err) => {
+        this.isProgressBarVisibile = false;
+        this.notificationSnackBarComponent.openSnackBar(
+          err,
+          SnackBarStatus.danger
+        );
+      }
+    });
+    this.isProgressBarVisibile = false;
   }
 
   handleFileInput(evt) {
