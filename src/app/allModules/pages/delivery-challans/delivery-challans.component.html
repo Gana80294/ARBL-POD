@@ -306,9 +306,10 @@
                                     Confirm
                                 </button>
 
+                                <!-- partially confirmed -->
                                 <button class="btnBg" mat-raised-button *ngIf="element.STATUS == 'Partially Confirmed'"
-                                    (click)="ConfirmQty(getFormGroupIndex(index))">Confirm
-                                    Qty</button>
+                                (click)="goToReverseLogisticsItem(element)">Confirm
+                                    </button>
 
                                 <button mat-raised-button disabled *ngIf="element.STATUS == 'Confirmed'">Confirm
                                 </button>

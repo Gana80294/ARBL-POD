@@ -1,68 +1,32 @@
-<div
-    id="rpod-details"
-    class="page-layout carded fullwidth"
-    fusePerfectScrollbar
->
+<div id="rpod-details" class="page-layout carded fullwidth" fusePerfectScrollbar>
     <div class="center">
         <div fxLayout="row" fxFlex="100">
-            <form
-                fxFlex="50"
-                [formGroup]="InvoiceFilterFormGroup"
-                fxLayout="row"
-                fxLayoutGap="5px"
-            >
-                <div
-                    fxLayout="row wrap"
-                    fxLayoutGap="20px"
-                    fxLayout.xs="column"
-                    class="mt-4 mx-12"
-                >
+            <form fxFlex="50" [formGroup]="InvoiceFilterFormGroup" fxLayout="row" fxLayoutGap="5px">
+                <div fxLayout="row wrap" fxLayoutGap="20px" fxLayout.xs="column" class="mt-4 mx-12">
                     <mat-form-field class="mx-8">
-                        <input
-                            matInput
-                            [matDatepicker]="picker"
-                            placeholder="Start Date"
-                            formControlName="StartDate"
-                        />
-                        <mat-datepicker-toggle
-                            matSuffix
-                            [for]="picker"
-                        ></mat-datepicker-toggle>
+                        <input matInput [matDatepicker]="picker" placeholder="Start Date" formControlName="StartDate" />
+                        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
                         <mat-datepicker #picker></mat-datepicker>
-                        <mat-error
-                            class="pl-4 errorClass"
-                            *ngIf="
+                        <mat-error class="pl-4 errorClass" *ngIf="
                                 InvoiceFilterFormGroup.get('StartDate')
                                     .touched &&
                                 InvoiceFilterFormGroup.get(
                                     'StartDate'
                                 ).hasError('required')
-                            "
-                        >
+                            ">
                             Start date is required
                         </mat-error>
                     </mat-form-field>
                     <mat-form-field fxLayout="column" class="mx-8">
-                        <input
-                            matInput
-                            [matDatepicker]="picker1"
-                            placeholder="End Date"
-                            formControlName="EndDate"
-                        />
-                        <mat-datepicker-toggle
-                            matSuffix
-                            [for]="picker1"
-                        ></mat-datepicker-toggle>
+                        <input matInput [matDatepicker]="picker1" placeholder="End Date" formControlName="EndDate" />
+                        <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
                         <mat-datepicker #picker1></mat-datepicker>
-                        <mat-error
-                            class="pl-4 errorClass"
-                            *ngIf="
+                        <mat-error class="pl-4 errorClass" *ngIf="
                                 InvoiceFilterFormGroup.get('EndDate').touched &&
                                 InvoiceFilterFormGroup.get('EndDate').hasError(
                                     'required'
                                 )
-                            "
-                        >
+                            ">
                             End date is required
                         </mat-error>
                     </mat-form-field>
@@ -71,61 +35,32 @@
                         <input placeholder="Customer Code" matInput formControlName="UserCode" />
                     </mat-form-field> -->
 
-                    <mat-form-field
-                        *ngIf="
+                    <mat-form-field *ngIf="
                             authenticationDetails.userRole == 'Amararaja User'
-                        "
-                    >
-                        <input
-                            placeholder="Customer Name"
-                            matInput
-                            formControlName="CustomerName"
-                        />
+                        ">
+                        <input placeholder="Customer Name" matInput formControlName="CustomerName" />
                     </mat-form-field>
 
                     <div fxFlex class="mr-8 ml-24 mt-8">
-                        <button
-                            mat-raised-button
-                            class="btnBg"
-                            (click)="filterAllReversePODs()"
-                        >
+                        <button mat-raised-button class="btnBg" (click)="filterAllReversePODs()">
                             Search
                         </button>
                     </div>
                 </div>
             </form>
             <div fxFlex="50" class="mt-8">
-                <div
-                    class="tile mx-20"
-                    fxFlex
-                    fxLayout="column"
-                    style="background-color: white; height: 300px !important"
-                >
-                    <div
-                        class="position-relative p-12"
-                        fxLayout="row"
-                        fxLayoutAlign="space-between center"
-                    >
+                <div class="tile mx-20" fxFlex fxLayout="column"
+                    style="background-color: white; height: 300px !important">
+                    <div class="position-relative p-12" fxLayout="row" fxLayoutAlign="space-between center">
                         <span>REVERSE LOGISTICS</span>
-                        <img
-                            src="assets/images/adjust.svg"
-                            style="height: 15px !important"
-                        />
+                        <img src="assets/images/adjust.svg" style="height: 15px !important" />
                     </div>
                     <div style="border-bottom: 2px solid #f3f6ee"></div>
                     <div fxFlex fxLayoutAlign="center">
-                        <div
-                            style="display: block; height: 200px; width: 320px"
-                        >
-                            <canvas
-                                baseChart
-                                [data]="doughnutChartData"
-                                [labels]="doughnutChartLabels"
-                                [chartType]="doughnutChartType"
-                                [options]="doughnutChartOptions"
-                                [colors]="colors"
-                                (chartClick)="doughnutChartClicked($event)"
-                            >
+                        <div style="display: block; height: 200px; width: 320px">
+                            <canvas baseChart [data]="doughnutChartData" [labels]="doughnutChartLabels"
+                                [chartType]="doughnutChartType" [options]="doughnutChartOptions" [colors]="colors"
+                                (chartClick)="doughnutChartClicked($event)">
                             </canvas>
                         </div>
                     </div>
@@ -136,44 +71,24 @@
         <div style="border-bottom: 2px solid #f3f6ee" class="my-12 mx-24"></div>
         <div fxLayout="column" class="mx-20" fxLayoutGap="10px">
             <div fxFlex fxLayoutAlign="start center">
-                <button
-                    *ngIf="isLoadMoreVisible"
-                    mat-flat-button
-                    class="strokedBtnBg"
-                    (click)="LoadMoreData()"
-                >
+                <button *ngIf="isLoadMoreVisible" mat-flat-button class="strokedBtnBg" (click)="LoadMoreData()">
                     Load more..
                 </button>
             </div>
             <div fxLayout="row" fxLayoutAlign="space-between center">
-                <span class="orangeBorderBottom h2"
-                    >Reverse Logistics Details</span
-                >
-                <button
-                    *ngIf="isApprover"
-                    (click)="exportAllAsXLSX()"
-                    class="excelBtn mb-8 ml-8"
-                    mat-stroked-button
-                >
+                <span class="orangeBorderBottom h2">Reverse Logistics Details</span>
+                <button *ngIf="isApprover" (click)="exportAllAsXLSX()" class="excelBtn mb-8 ml-8" mat-stroked-button>
                     <img class="excelImg" src="assets/images/excel.png" />
                     Export to excel
                 </button>
             </div>
             <div class="container">
                 <!-- <form class="abnormal" [formGroup]="RpodDetailsFormGroup"> -->
-                <table
-                    class="table"
-                    mat-table
-                    [dataSource]="dataSource"
-                    multiTemplateDataRows
-                >
+                <table class="table" mat-table [dataSource]="dataSource" multiTemplateDataRows>
                     <ng-container matColumnDef="DC_Number">
                         <th mat-header-cell *matHeaderCellDef>DC Number</th>
-                        <td
-                            mat-cell
-                            *matCellDef="let element; let index = index"
-                            (click)="goToReverseLogisticsItem(element)"
-                        >
+                        <td mat-cell *matCellDef="let element; let index = index"
+                            (click)="goToReverseLogisticsItem(element)">
                             {{ element.DC_NUMBER }}
                         </td>
                     </ng-container>
@@ -182,110 +97,70 @@
                         <th mat-header-cell *matHeaderCellDef>
                             Claim Creation Date
                         </th>
-                        <td
-                            mat-cell
-                            *matCellDef="let element"
-                            (click)="goToReverseLogisticsItem(element)"
-                        >
+                        <td mat-cell *matCellDef="let element" (click)="goToReverseLogisticsItem(element)">
                             {{ element.SLA_DATE | date : "dd/MM/yyyy" }}
                         </td>
                     </ng-container>
 
                     <ng-container matColumnDef="DC_Date">
                         <th mat-header-cell *matHeaderCellDef>DC Date</th>
-                        <td
-                            mat-cell
-                            *matCellDef="let element"
-                            (click)="goToReverseLogisticsItem(element)"
-                        >
+                        <td mat-cell *matCellDef="let element" (click)="goToReverseLogisticsItem(element)">
                             {{ element.DC_DATE | date : "dd/MM/yyyy" }}
                         </td>
                     </ng-container>
 
                     <ng-container matColumnDef="Claim_Type">
                         <th mat-header-cell *matHeaderCellDef>Claim Type</th>
-                        <td
-                            mat-cell
-                            *matCellDef="let element"
-                            (click)="goToReverseLogisticsItem(element)"
-                        >
+                        <td mat-cell *matCellDef="let element" (click)="goToReverseLogisticsItem(element)">
                             {{ element.CLAIM_TYPE }}
                         </td>
                     </ng-container>
 
                     <ng-container matColumnDef="Customer_Name">
                         <th mat-header-cell *matHeaderCellDef>Customer Name</th>
-                        <td
-                            mat-cell
-                            *matCellDef="let element"
-                            (click)="goToReverseLogisticsItem(element)"
-                        >
+                        <td mat-cell *matCellDef="let element" (click)="goToReverseLogisticsItem(element)">
                             {{ element.CUSTOMER_NAME }}
                         </td>
                     </ng-container>
 
                     <ng-container matColumnDef="Plant_Name">
                         <th mat-header-cell *matHeaderCellDef>Plant Name</th>
-                        <td
-                            mat-cell
-                            *matCellDef="let element"
-                            (click)="goToReverseLogisticsItem(element)"
-                        >
+                        <td mat-cell *matCellDef="let element" (click)="goToReverseLogisticsItem(element)">
                             {{ element.PLANT_NAME }}
                         </td>
                     </ng-container>
 
                     <ng-container matColumnDef="Status">
                         <th mat-header-cell *matHeaderCellDef>Status</th>
-                        <td
-                            mat-cell
-                            *matCellDef="let element"
-                            (click)="goToReverseLogisticsItem(element)"
-                        >
+                        <td mat-cell *matCellDef="let element" (click)="goToReverseLogisticsItem(element)">
                             {{ element.STATUS }}
                         </td>
                     </ng-container>
 
                     <ng-container matColumnDef="PENDING_DAYS">
                         <th mat-header-cell *matHeaderCellDef>Pending Days</th>
-                        <td
-                            mat-cell
-                            *matCellDef="let element"
-                            (click)="goToReverseLogisticsItem(element)"
-                        >
+                        <td mat-cell *matCellDef="let element" (click)="goToReverseLogisticsItem(element)">
                             {{ element.PENDING_DAYS }}
                         </td>
                     </ng-container>
 
                     <ng-container matColumnDef="Total_Qty">
                         <th mat-header-cell *matHeaderCellDef>Total Qty</th>
-                        <td
-                            mat-cell
-                            *matCellDef="let element"
-                            (click)="goToReverseLogisticsItem(element)"
-                        >
+                        <td mat-cell *matCellDef="let element" (click)="goToReverseLogisticsItem(element)">
                             {{ element.TOTAL_QUANTITY }}
                         </td>
                     </ng-container>
 
                     <ng-container matColumnDef="Billed_Qty">
                         <th mat-header-cell *matHeaderCellDef>Billed Qty</th>
-                        <td
-                            mat-cell
-                            *matCellDef="let element"
-                            (click)="goToReverseLogisticsItem(element)"
-                        >
+                        <td mat-cell *matCellDef="let element" (click)="goToReverseLogisticsItem(element)">
                             {{ element.BILLED_QUANTITY }}
                         </td>
                     </ng-container>
 
                     <ng-container matColumnDef="Balance_Qty">
                         <th mat-header-cell *matHeaderCellDef>Balance Qty</th>
-                        <td
-                            mat-cell
-                            *matCellDef="let element"
-                            (click)="goToReverseLogisticsItem(element)"
-                        >
+                        <td mat-cell *matCellDef="let element" (click)="goToReverseLogisticsItem(element)">
                             {{ element.BALANCE_QUANTITY }}
                         </td>
                     </ng-container>
@@ -293,39 +168,27 @@
                     <ng-container matColumnDef="LR_Details">
                         <th mat-header-cell *matHeaderCellDef>LR Details</th>
                         <td mat-cell *matCellDef="let element">
-                            <span class="viewLink"
-                                (click)="
+                            <span class="viewLink" (click)="
                                     expandedElement =
                                         expandedElement === element
                                             ? null
                                             : element
-                                "
-                                >view</span
-                            >
+                                ">view</span>
                         </td>
                     </ng-container>
 
                     <ng-container matColumnDef="expandedDetail">
-                        <td
-                            mat-cell
-                            *matCellDef="let element"
-                            [attr.colspan]="displayedColumns.length"
-                        >
-                            <div
-                                class="example-element-detail"
-                                [@detailExpand]="
+                        <td mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns.length">
+                            <div class="example-element-detail" [@detailExpand]="
                                     element == expandedElement
                                         ? 'expanded'
                                         : 'collapsed'
-                                "
-                            >
-                                <div class="p-12"
-                                    *ngIf="
+                                ">
+                                <div class="p-12" *ngIf="
                                         element.LR_DETAILS != null &&
                                             element.LR_DETAILS.length > 0;
                                         else elseBlock
-                                    "
-                                >
+                                    ">
                                     <table class="lr-table">
                                         <tr>
                                             <th>LR No</th>
@@ -335,41 +198,51 @@
                                             <th>Customer LR</th>
                                             <th>DC LR</th>
                                         </tr>
-                                        <tr
-                                            *ngFor="
+                                        <tr *ngFor="
                                                 let lrData of element.LR_DETAILS
-                                            "
-                                        >
+                                            ">
                                             <td>{{ lrData.LR_NO }}</td>
                                             <td>
                                                 {{ lrData.LR_DATE | date }}
                                             </td>
                                             <td>
                                                 {{
-                                                    lrData.DC_RECEIEVED_DATE
-                                                        | date
+                                                lrData.DC_RECEIEVED_DATE
+                                                | date
                                                 }}
                                             </td>
                                             <td>
                                                 {{
-                                                    lrData.DC_ACKNOWLEDGEMENT_DATE
-                                                        | date
+                                                lrData.DC_ACKNOWLEDGEMENT_DATE
+                                                | date
                                                 }}
                                             </td>
                                             <td>
-                                                {{ lrData.CUSTOMER_DOC_ID }}
+                                                <div>
+                                                    <mat-icon svgIcon="photoIcon" 
+                                                    *ngIf="
+                                                    lrData.CUSTOMER_DOC_ID;
+                                                    else elsePart
+                                                ">
+                                                    </mat-icon>
+                                                    <ng-template #elsePart> - </ng-template>
+                                                </div>
                                             </td>
-                                            <td>{{ lrData.DC_DOC_ID }}</td>
+                                            <td>
+                                                <div>
+                                                    <mat-icon svgIcon="photoIcon" 
+                                                    *ngIf="
+                                                    lrData.DC_DOC_ID;
+                                                    else elsePart1
+                                                ">
+                                                    </mat-icon>
+                                                    <ng-template #elsePart1> - </ng-template>
+                                                </div>
                                         </tr>
                                     </table>
                                 </div>
                                 <ng-template #elseBlock>
-                                    <div
-                                        class="p-12"
-                                        fxFlex="100"
-                                        fxLayout="row"
-                                        fxLayoutAlign="center center"
-                                    >
+                                    <div class="p-12" fxFlex="100" fxLayout="row" fxLayoutAlign="center center">
                                         <span>No LR Details.</span>
                                     </div>
                                 </ng-template>
@@ -378,52 +251,30 @@
                     </ng-container>
 
                     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                    <tr
-                        mat-row
-                        *matRowDef="let row; columns: displayedColumns"
-                        class="example-element-row"
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns" class="example-element-row"
                         [class.example-expanded-row]="
                             expandedElement === element
-                        "
-                        style="cursor: pointer !important"
-                    ></tr>
-                    <tr
-                        mat-row
-                        *matRowDef="let row; columns: ['expandedDetail']"
-                        class="example-detail-row"
-                    ></tr>
+                        " style="cursor: pointer !important"></tr>
+                    <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="example-detail-row"></tr>
                 </table>
                 <div *ngIf="!FilteredRpodDetails?.length">
-                    <mat-icon
-                        svgIcon="infoIcon"
-                        style="
+                    <mat-icon svgIcon="infoIcon" style="
                             color: #1b56ca;
                             margin-top: 10px;
                             margin-left: 70px;
-                        "
-                    ></mat-icon>
-                    <span style="margin-left: 10px"
-                        >The table does not contain any data</span
-                    >
+                        "></mat-icon>
+                    <span style="margin-left: 10px">The table does not contain any data</span>
                 </div>
                 <!-- </form> -->
             </div>
             <div flex>
-                <mat-paginator
-                    [pageSizeOptions]="[5, 10, 25, 50, 100, 200, 500, 1000]"
-                    showFirstLastButtons
-                    (page)="pageSelect($event)"
-                ></mat-paginator>
+                <mat-paginator [pageSizeOptions]="[5, 10, 25, 50, 100, 200, 500, 1000]" showFirstLastButtons
+                    (page)="pageSelect($event)"></mat-paginator>
             </div>
         </div>
     </div>
 
-    <mat-progress-spinner
-        *ngIf="isProgressBarVisibile"
-        class="progressBarPostion"
-        color="accent"
-        mode="indeterminate"
-    >
+    <mat-progress-spinner *ngIf="isProgressBarVisibile" class="progressBarPostion" color="accent" mode="indeterminate">
     </mat-progress-spinner>
     <div id="overlay" *ngIf="isProgressBarVisibile"></div>
 </div>
