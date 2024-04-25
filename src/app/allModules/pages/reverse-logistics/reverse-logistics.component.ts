@@ -21,6 +21,7 @@ import { AttachmentDialogComponent } from "app/allModules/reports/attachment-dia
 import {
     AttachmentDetails,
     ReversePOD,
+    ReversePODDashboard,
     ReversePODFilter,
     ReversePodUpdation,
 } from "app/models/invoice-details";
@@ -34,12 +35,32 @@ import { ChartType } from "chart.js";
 import { Guid } from "guid-typescript";
 import { saveAs } from "file-saver";
 import { ShareParameterService } from "app/services/share-parameters.service";
+import {
+    trigger,
+    state,
+    style,
+    transition,
+    animate,
+} from "@angular/animations";
 
 @Component({
     selector: "app-reverse-logistics",
     templateUrl: "./reverse-logistics.component.html",
     styleUrls: ["./reverse-logistics.component.scss"],
     encapsulation: ViewEncapsulation.None,
+    animations: [
+        trigger("detailExpand", [
+            state(
+                "collapsed",
+                style({ height: "0px", minHeight: "0", display: "none" })
+            ),
+            state("expanded", style({ height: "*" })),
+            transition(
+                "expanded <=> collapsed",
+                animate("225ms cubic-bezier(0.4, 0.0, 0.2, 1)")
+            ),
+        ]),
+    ],
 })
 export class ReverseLogisticsComponent implements OnInit {
     InvoiceFilterFormGroup: FormGroup;
@@ -99,24 +120,15 @@ export class ReverseLogisticsComponent implements OnInit {
         "Claim_Type",
         "Customer_Name",
         "Plant_Name",
-        // "Material_Code",
-        // "Quantity",
-        // "Customer_Delivery_Quantity",
-        // "Customer_Pending_Quantity",
-        // "Handovered_Status",
-        "LR_Number",
-        "LR_Date",
-        "CustomerLR",
-        // "DC_Received_Quantity",
-        // "DC_Pending_Quantity",
-        "DC_Received_Date",
-        "DC_Acknowledgement_Date",
         "Status",
-        "DCLR",
         "PENDING_DAYS",
-        // "Remarks",
+        "Total_Qty",
+        "Billed_Qty",
+        "Balance_Qty",
+        "LR_Details",
     ];
-    dataSource = new MatTableDataSource<ReversePOD>();
+    expandedElement: ReversePODDashboard | null;
+    dataSource = new MatTableDataSource<ReversePODDashboard>();
     @ViewChild(MatPaginator) paginator: MatPaginator;
     @ViewChild(MatSort) sort: MatSort;
     @ViewChild("reversePodFileInput") fileInput: ElementRef<HTMLElement>;
@@ -149,7 +161,7 @@ export class ReverseLogisticsComponent implements OnInit {
         public _reversePod: ReversePodService,
         private _datePipe: DatePipe,
         private dialog: MatDialog,
-        private _shareParameterService: ShareParameterService,
+        private _shareParameterService: ShareParameterService
     ) {
         this.notificationSnackBarComponent = new NotificationSnackBarComponent(
             this.snackBar
@@ -235,7 +247,9 @@ export class ReverseLogisticsComponent implements OnInit {
             this.InvoiceFilterFormGroup.get("PlantList").value &&
             this.InvoiceFilterFormGroup.get("PlantList").value.length > 0
                 ? this.InvoiceFilterFormGroup.get("PlantList").value
-                : this.authenticationDetails.plant ? this.authenticationDetails.plant.split(",") : [];
+                : this.authenticationDetails.plant
+                ? this.authenticationDetails.plant.split(",")
+                : [];
 
         filterPayload.UserCode =
             this.InvoiceFilterFormGroup.get("UserCode").value;
@@ -285,7 +299,9 @@ export class ReverseLogisticsComponent implements OnInit {
             this.InvoiceFilterFormGroup.get("PlantList").value &&
             this.InvoiceFilterFormGroup.get("PlantList").value.length > 0
                 ? this.InvoiceFilterFormGroup.get("PlantList").value
-                : this.authenticationDetails.plant ? this.authenticationDetails.plant.split(",") : [];
+                : this.authenticationDetails.plant
+                ? this.authenticationDetails.plant.split(",")
+                : [];
         isCustomer
             ? (filterPayload.UserCode = this.authenticationDetails.userCode)
             : (filterPayload.UserCode = null);
@@ -326,7 +342,9 @@ export class ReverseLogisticsComponent implements OnInit {
             this.InvoiceFilterFormGroup.get("PlantList").value &&
             this.InvoiceFilterFormGroup.get("PlantList").value.length > 0
                 ? this.InvoiceFilterFormGroup.get("PlantList").value
-                : this.authenticationDetails.plant ? this.authenticationDetails.plant.split(",") : [];
+                : this.authenticationDetails.plant
+                ? this.authenticationDetails.plant.split(",")
+                : [];
         isCustomer
             ? (filterPayload.UserCode = this.authenticationDetails.userCode)
             : (filterPayload.UserCode = null);
@@ -369,7 +387,9 @@ export class ReverseLogisticsComponent implements OnInit {
             this.InvoiceFilterFormGroup.get("PlantList").value &&
             this.InvoiceFilterFormGroup.get("PlantList").value.length > 0
                 ? this.InvoiceFilterFormGroup.get("PlantList").value
-                : this.authenticationDetails.plant ? this.authenticationDetails.plant.split(",") : [];
+                : this.authenticationDetails.plant
+                ? this.authenticationDetails.plant.split(",")
+                : [];
         isCustomer
             ? (filterPayload.UserCode = this.authenticationDetails.userCode)
             : (filterPayload.UserCode = null);
@@ -412,7 +432,9 @@ export class ReverseLogisticsComponent implements OnInit {
             this.InvoiceFilterFormGroup.get("PlantList").value &&
             this.InvoiceFilterFormGroup.get("PlantList").value.length > 0
                 ? this.InvoiceFilterFormGroup.get("PlantList").value
-                : this.authenticationDetails.plant ? this.authenticationDetails.plant.split(",") : [];
+                : this.authenticationDetails.plant
+                ? this.authenticationDetails.plant.split(",")
+                : [];
         isCustomer
             ? (filterPayload.UserCode = this.authenticationDetails.userCode)
             : (filterPayload.UserCode = null);
@@ -458,18 +480,20 @@ export class ReverseLogisticsComponent implements OnInit {
             .GetAllReversePODByCustomer(this.authenticationDetails.userCode)
             .subscribe({
                 next: (res) => {
-                    if (res.length < this.records) {
-                        this.isLoadMoreVisible = false;
-                    } else {
-                        this.isLoadMoreVisible = true;
-                    }
-                    res = this.ValueChangeEvents(res);
-                    console.log(res);
-                    this.FilteredRpodDetails = res;
                     this.isProgressBarVisibile = false;
-                    this.dataSource = new MatTableDataSource(res);
-                    this.dataSource.paginator = this.paginator;
-                    this.updateChartValue();
+                    if(res){
+                        if (res.length < this.records) {
+                            this.isLoadMoreVisible = false;
+                        } else {
+                            this.isLoadMoreVisible = true;
+                        }
+                        res = this.ValueChangeEvents(res);
+                        console.log(res);
+                        this.FilteredRpodDetails = res;
+                        this.dataSource = new MatTableDataSource(res);
+                        this.dataSource.paginator = this.paginator;
+                        this.updateChartValue();
+                    }
                 },
                 error: () => {
                     this.isProgressBarVisibile = false;
@@ -481,18 +505,15 @@ export class ReverseLogisticsComponent implements OnInit {
         let data = [0, 0, 0, 0];
         if (this.FilteredRpodDetails) {
             data = [
-                this.FilteredRpodDetails.filter(
-                    (x) => x.STATUS == "Open"
-                ).length,
-                this.FilteredRpodDetails.filter(
-                    (x) => x.STATUS == "In Transit"
-                ).length,
+                this.FilteredRpodDetails.filter((x) => x.STATUS == "Open")
+                    .length,
+                this.FilteredRpodDetails.filter((x) => x.STATUS == "In Transit")
+                    .length,
                 this.FilteredRpodDetails.filter(
                     (x) => x.STATUS == "Partially Confirmed"
                 ).length,
-                this.FilteredRpodDetails.filter(
-                    (x) => x.STATUS == "Confirmed"
-                ).length,
+                this.FilteredRpodDetails.filter((x) => x.STATUS == "Confirmed")
+                    .length,
             ];
         }
 
@@ -831,7 +852,9 @@ export class ReverseLogisticsComponent implements OnInit {
             this.InvoiceFilterFormGroup.get("PlantList").value &&
             this.InvoiceFilterFormGroup.get("PlantList").value.length > 0
                 ? this.InvoiceFilterFormGroup.get("PlantList").value
-                : this.authenticationDetails.plant ? this.authenticationDetails.plant.split(",") : [];
+                : this.authenticationDetails.plant
+                ? this.authenticationDetails.plant.split(",")
+                : [];
 
         filterPayload.UserCode =
             this.InvoiceFilterFormGroup.get("UserCode").value;
@@ -872,7 +895,7 @@ export class ReverseLogisticsComponent implements OnInit {
         return this.pageIndex * this.pageSize + ind;
     }
 
-    goToReverseLogisticsItem(revLogDetails:ReversePOD){
+    goToReverseLogisticsItem(revLogDetails: ReversePOD) {
         this._shareParameterService.setReverseLogisticDetail(revLogDetails);
         this._router.navigate(["/pages/reverseLogisticsItem"]);
     }
