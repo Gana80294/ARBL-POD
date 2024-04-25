@@ -67,7 +67,7 @@ import { forkJoin } from "rxjs";
     styleUrls: ["./reverse-logistics-item.component.scss"],
     encapsulation: ViewEncapsulation.None,
     animations: [
-        trigger("detailExpand", [
+        trigger("detailExpand1", [
             state(
                 "collapsed",
                 style({ height: "0px", minHeight: "0", display: "none" })
@@ -183,7 +183,7 @@ export class ReverseLogisticsItemComponent implements OnInit {
         private _decimalPipe: DecimalPipe,
         private renderer: Renderer,
         private _reversePodService: ReversePodService
-    ) {}
+    ) { }
 
     ngOnInit(): void {
         // Retrive authorizationData
@@ -233,10 +233,11 @@ export class ReverseLogisticsItemComponent implements OnInit {
             this.selectedReverseLogisticDetail.RPOD_HEADER_ID
         );
 
-        
+
     }
 
     addRpodForm(materialDetail: ReversePodMaterialDetail) {
+        console.log(materialDetail);
         let receivedQty1: number = 0;
         if (this.currentUserRole == "Customer") {
             receivedQty1 = 0;
@@ -246,6 +247,7 @@ export class ReverseLogisticsItemComponent implements OnInit {
                 : materialDetail.QUANTITY;
         }
 
+        console.log(materialDetail.HAND_OVERED_QUANTITY)
         let materialForm = this._formBuilder.group({
             HAND_OVERED_QUANTITY: [
                 materialDetail.HAND_OVERED_QUANTITY
@@ -256,6 +258,7 @@ export class ReverseLogisticsItemComponent implements OnInit {
             RECEIVED_QUANTITY: [receivedQty1, [Validators.required]],
             REMARKS: [materialDetail.REMARKS ? materialDetail.REMARKS : ""],
         });
+        // console.log('mf', materialForm);
 
         if (this.currentUserRole == "Customer") {
             materialForm.get("RECEIVED_QUANTITY").disable();
@@ -267,6 +270,7 @@ export class ReverseLogisticsItemComponent implements OnInit {
         (
             this.reverseLogisticsItemFormGroup.get("RPodItemArray") as FormArray
         ).push(materialForm);
+        console.log(this.reverseLogisticsItemFormGroup);
     }
 
     getReversePodMaterialDetails(headerID: number) {
@@ -288,7 +292,7 @@ export class ReverseLogisticsItemComponent implements OnInit {
                     );
                 }
             },
-            (err) => {}
+            (err) => { }
         );
     }
 
@@ -301,7 +305,7 @@ export class ReverseLogisticsItemComponent implements OnInit {
                     );
                 }
             },
-            (err) => {}
+            (err) => { }
         );
     }
 
@@ -313,6 +317,7 @@ export class ReverseLogisticsItemComponent implements OnInit {
         } else if (handOveredQty < actualQty) {
             this.dataSource.data[index].STATUS = "Partially Confirmed";
         }
+        console.log(this.dataSource.data[index]);
         this.dataSource._updateChangeSubscription();
     }
 
@@ -372,7 +377,7 @@ export class ReverseLogisticsItemComponent implements OnInit {
             } else if (
                 this.currentUserRole != "Customer" &&
                 rPOdFormArray[i].value.HAND_OVERED_QUANTITY <
-                    rPOdFormArray[i].value.RECEIVED_QUANTITY
+                rPOdFormArray[i].value.RECEIVED_QUANTITY
             ) {
                 return false;
             } else if (rPOdFormArray[i].value.RECEIVED_QUANTITY < 0) {
@@ -430,7 +435,7 @@ export class ReverseLogisticsItemComponent implements OnInit {
             payLoad.DC_RECEIEVED_DATE,
             "yyyy-MM-dd HH:mm:ss"
         );
-        payLoad.Status = this.currentUserRole == "Customer" ? 1 : 2;
+        payLoad.Code = this.currentUserRole == "Customer" ? 1 : 2;
         payLoad.DC_ACKNOWLEDGEMENT_DATE =
             this.selectedReverseLogisticDetail.DC_ACKNOWLEDGEMENT_DATE;
         payLoad.STATUS = this.selectedReverseLogisticDetail.STATUS;
@@ -438,10 +443,10 @@ export class ReverseLogisticsItemComponent implements OnInit {
             this.currentUserRole == "Customer"
                 ? "In Transit"
                 : this.dataSource.data.some((x) =>
-                      x.STATUS.toLowerCase().includes("partially confirmed")
-                  )
-                ? "Partially Confirmed"
-                : "Confirmed";
+                    x.STATUS.toLowerCase().includes("partially confirmed")
+                )
+                    ? "Partially Confirmed"
+                    : "Confirmed";
 
         const RPODFORMARRAY = this.reverseLogisticsItemFormGroup.get(
             "RPodItemArray"
@@ -578,5 +583,21 @@ export class ReverseLogisticsItemComponent implements OnInit {
         //         SnackBarStatus.danger
         //     );
         // }
+    }
+
+    isVisible() {
+        if (this.currentUserRole == 'Customer') {
+            return (this.selectedReverseLogisticDetail.STATUS.toLowerCase() == 'open' ||
+                this.selectedReverseLogisticDetail.STATUS.toLowerCase() == 'partially confirmed'); 
+                 
+              
+        }
+        else if (this.currentUserRole.toLowerCase() == 'amararaja user') {
+            return (this.selectedReverseLogisticDetail.STATUS.toLowerCase() == 'in transit' ||
+                this.selectedReverseLogisticDetail.STATUS.toLowerCase() == 'partially confirmed'); 
+        }
+        else {
+            return false;
+        }
     }
 }

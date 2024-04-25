@@ -585,7 +585,7 @@ export class DeliveryChallansComponent implements OnInit {
             payLoad.DC_RECEIEVED_DATE,
             "yyyy-MM-dd HH:mm:ss"
         );
-        payLoad.Status = this.currentUserRole == 'Customer' ? 1 : 2;
+        payLoad.Code = this.currentUserRole == 'Customer' ? 1 : 2;
         payLoad.DC_ACKNOWLEDGEMENT_DATE =
             this.FilteredRpodDetails[this.selectedIndex].DC_ACKNOWLEDGEMENT_DATE;
         payLoad.STATUS =
@@ -601,18 +601,18 @@ export class DeliveryChallansComponent implements OnInit {
             FORMDATA.append("Payload", JSON.stringify(payLoad));
         }
         console.log(FORMDATA);
-        // this.isProgressBarVisibile = true;
-        // this._reversePod.confirmReversePod(FORMDATA).subscribe({
-        //     next: (res) => {
-                // if(res){
-                //     this.isProgressBarVisibile = false;
-                // }
-        //     },
-        //     error: (err) => {
-                //     this.isProgressBarVisibile = false;
-        //     }
-        // });
-        //     this.isProgressBarVisibile = false;
+        this.isProgressBarVisibile = true;
+        this._reversePod.confirmReversePodDirectly(FORMDATA).subscribe({
+            next: (res) => {
+                if(res){
+                    this.isProgressBarVisibile = false;
+                }
+            },
+            error: (err) => {
+                    this.isProgressBarVisibile = false;
+            }
+        });
+            this.isProgressBarVisibile = false;
     }
 
     handleFileInput(evt) {
@@ -697,7 +697,7 @@ export class DeliveryChallansComponent implements OnInit {
                 payLoad.LR_DATE,
                 "yyyy-MM-dd HH:mm:ss"
             );
-            payLoad.Status = 1;
+            payLoad.Code = 1;
             console.log("payload", payLoad);
             const formData: FormData = new FormData();
 
@@ -748,7 +748,7 @@ export class DeliveryChallansComponent implements OnInit {
                 payLoad.DC_RECEIEVED_DATE,
                 "yyyy-MM-dd HH:mm:ss"
             );
-            payLoad.Status = 2;
+            payLoad.Code = 2;
 
             const formData: FormData = new FormData();
             formData.append("Payload", JSON.stringify(payLoad));
@@ -905,7 +905,7 @@ export class DeliveryChallansComponent implements OnInit {
             payLoad.DC_RECEIEVED_DATE,
             "yyyy-MM-dd HH:mm:ss"
         );
-        payLoad.Status = 2;
+        payLoad.Code = 2;
 
         // if (payLoad.RECEIVED_QUANTITY > payLoad.HAND_OVERED_QUANTITY) {
         //     this.notificationSnackBarComponent.openSnackBar(
