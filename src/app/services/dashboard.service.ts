@@ -620,10 +620,18 @@ export class DashboardService {
             .pipe(catchError(this.errorHandler));
     }
 
-    getReversePodMaterialDetails(headerID:number):Observable<any>{
+    getReversePodMaterialDetails(headerID: number): Observable<any> {
         return this._httpClient
             .get<any>(
-                `${this.baseAddress}api/ReversePOD/GetReverseMaterialDetails?HeaderId=${headerID}`
+                `${this.baseAddress}api/ReversePOD/GetReverseMaterialDetails?headerId=${headerID}`
+            )
+            .pipe(catchError(this.errorHandler));
+    }
+
+    getReversePodLrDetails(headerID: number): Observable<any> {
+        return this._httpClient
+            .get<any>(
+                `${this.baseAddress}api/ReversePOD/GetLRDetailsByHeaderId?headerId=${headerID}`
             )
             .pipe(catchError(this.errorHandler));
     }

@@ -46,8 +46,7 @@ export class DeliveryChallansComponent implements OnInit {
 
     RpodDetailsFormGroup: FormGroup;
     RpodDetailsFormArray: FormArray = this._formBuilder.array([]);
-    //status:any;
-    //@ViewChild('Quantity')Quantity:ElementRef;
+
     notificationSnackBarComponent: NotificationSnackBarComponent;
     public doughnutChartType: ChartType = "doughnut";
     public doughnutChartLabels: any[] = [

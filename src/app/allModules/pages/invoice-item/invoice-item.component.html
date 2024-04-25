@@ -94,7 +94,7 @@
                 [formGroup]="InvoiceItemFormGroup"
                 fxLayout="column"
                 fxLayoutAlign="start"
-                fxFlex="1 0 auto"
+                fxFlex="100"
                 novalidate
                 class="abnormal"
             >
@@ -642,78 +642,6 @@
                                     </div>
                                 </td>
                             </ng-container>
-
-                            <!-- <ng-container matColumnDef="RECEIVED_QUANTITY">
-                <th mat-header-cell *matHeaderCellDef> Received Qty
-                </th>
-                <td mat-cell *matCellDef="let element;let i=index;" [formGroupName]="i">
-                  <mat-form-field *ngIf="(currentUserRole | lowercase)==='customer'" appearance="outline"
-                    class="pl-8 pr-16">
-                    <input matInput formControlName="RECEIVED_QUANTITY" pattern="^[0-9]\d*$" (keyup)="valueChanges(InvoiceItemFormGroup.get('InvoiceItems')['controls'][index]?.get('QUANTITY')?.value, 
-                    InvoiceItemFormGroup.get('InvoiceItems')['controls'][index]?.get('RECEIVED_QUANTITY')?.value,i)">
-                    <mat-error class="pl-4 errorClass" *ngIf="InvoiceItemFormGroup.get('InvoiceItems')['controls'][index].get('RECEIVED_QUANTITY').touched &&
-                InvoiceItemFormGroup.get('InvoiceItems')['controls'][index].get('RECEIVED_QUANTITY').hasError('required')">
-                      Received quantity is required
-                    </mat-error>
-                    <mat-error class="pl-4 errorClass" *ngIf="InvoiceItemFormGroup.get('InvoiceItems')['controls'][index].get('RECEIVED_QUANTITY').touched &&
-            !InvoiceItemFormGroup.get('InvoiceItems')['controls'][index].get('RECEIVED_QUANTITY').hasError('required') &&
-            InvoiceItemFormGroup.get('InvoiceItems')['controls'][index].get('RECEIVED_QUANTITY').hasError('max')">
-                      Value should not greater than ordered quantity
-                    </mat-error>
-                    <mat-error class="pl-4 errorClass" *ngIf="InvoiceItemFormGroup.get('InvoiceItems')['controls'][index].get('RECEIVED_QUANTITY').touched &&
-              !InvoiceItemFormGroup.get('InvoiceItems')['controls'][index].get('RECEIVED_QUANTITY').hasError('required') &&
-              InvoiceItemFormGroup.get('InvoiceItems')['controls'][index].get('RECEIVED_QUANTITY').hasError('pattern')">
-                      Enter valid value for quantity
-                    </mat-error>
-                    <span fxFlex class="ml-4">
-                      {{InvoiceItemFormGroup.get('InvoiceItems')['controls'][index]?.get('QUANTITY_UOM')?.value}}
-                    </span>
-                  </mat-form-field>
-                  <div fxFlex fxLayoutAlign="start center" *ngIf="(currentUserRole | lowercase)==='amararaja user'">
-                    {{InvoiceItemFormGroup.get('InvoiceItems')['controls'][index]?.get('RECEIVED_QUANTITY')?.value}}
-                    <span class="ml-4">
-                      {{InvoiceItemFormGroup.get('InvoiceItems')['controls'][index]?.get('QUANTITY_UOM')?.value}}
-                    </span>
-                  </div>
-                </td>
-              </ng-container>
-
-              <ng-container matColumnDef="REASON">
-                <th mat-header-cell *matHeaderCellDef> Reason </th>
-                <td mat-cell *matCellDef="let element;let i=index;" [formGroupName]="i">
-                  <mat-form-field *ngIf="(currentUserRole | lowercase)==='customer'" appearance="outline" class="pl-8">
-                    <mat-select matInput formControlName="REASON">
-                      <mat-option [value]="rest.Description" *ngFor="let rest of AllReasons">{{rest.Description}}
-                      </mat-option>
-                    </mat-select>
-                    <mat-error class="pl-4 errorClass" *ngIf="InvoiceItemFormGroup.get('InvoiceItems')['controls'][index].get('REASON').touched &&
-                InvoiceItemFormGroup.get('InvoiceItems')['controls'][index].get('REASON').hasError('required')">
-                      Reason is required
-                    </mat-error>
-                  </mat-form-field>
-                  <div fxFlex fxLayoutAlign="start center" *ngIf="(currentUserRole | lowercase)==='amararaja user'">
-                    {{InvoiceItemFormGroup.get('InvoiceItems')['controls'][index]?.get('REASON')?.value}}
-                  </div>
-                </td>
-              </ng-container>
-
-              <ng-container matColumnDef="REMARKS">
-                <th mat-header-cell *matHeaderCellDef> Remarks </th>
-                <td mat-cell *matCellDef="let element;let i=index;" [formGroupName]="i">
-                  <mat-form-field *ngIf="(currentUserRole | lowercase)==='customer'" appearance="outline" class="pl-8">
-                    <textarea cdkTextAreaAutosize cdkAutosizeMinRows="2" matInput formControlName="REMARKS"></textarea>
-                    <mat-error class="pl-4 errorClass" *ngIf="InvoiceItemFormGroup.get('InvoiceItems')['controls'][index].get('REMARKS').touched &&
-                InvoiceItemFormGroup.get('InvoiceItems')['controls'][index].get('REMARKS').hasError('required')">
-                      Remarks is required
-                    </mat-error>
-                  </mat-form-field>
-                  <div fxFlex fxLayoutAlign="start center" *ngIf="(currentUserRole | lowercase)==='amararaja user'">
-                    <span class="ml-4">
-                      {{InvoiceItemFormGroup.get('InvoiceItems')['controls'][index]?.get('REMARKS')?.value}}
-                    </span>
-                  </div>
-                </td>
-              </ng-container> -->
 
                             <tr
                                 mat-header-row
