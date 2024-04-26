@@ -574,7 +574,7 @@ export class ReverseLogisticsComponent implements OnInit {
                 payLoad.LR_DATE,
                 "yyyy-MM-dd HH:mm:ss"
             );
-            payLoad.Status = 1;
+            payLoad.Code = 1;
             console.log("payload", payLoad);
             const formData: FormData = new FormData();
 

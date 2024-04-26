@@ -8,11 +8,7 @@
                 <div fxFlex fxLayoutAlign="end">
                     <!-- Confirm btn -->
                     <button
-                        *ngIf="
-                            !selectedReverseLogisticDetail?.STATUS.toLowerCase().includes(
-                                'confirmed'
-                            )
-                        "
+                        *ngIf="isVisible()"
                         mat-raised-button
                         class="mr-4 confirmBtn"
                         (click)="confirmReversePOD()"
@@ -48,13 +44,11 @@
         </mat-card>
         <div class="sidenav-content">
             <form
-                autocomplete="off"
                 name="form"
                 [formGroup]="reverseLogisticsItemFormGroup"
                 fxLayout="column"
                 fxLayoutAlign="start"
                 fxFlex="100"
-                novalidate
                 class="abnormal"
                 id="abnormal"
             >
@@ -222,20 +216,50 @@
                                     {{ LrDetailColNames[col] }}
                                 </th>
                                 <td mat-cell *matCellDef="let element">
-                                    <div
+                                    <!-- <div
                                         *ngIf="
                                             !col.toLowerCase().includes('date')
                                         "
+                                        *ngIfElse="loading"
                                     >
                                         {{ element[col] }}
-                                    </div>
+                                    </div> -->
                                     <div
                                         *ngIf="
-                                            col.toLowerCase().includes('date')
+                                            col.toLowerCase().includes('date');
+                                            else elseIfBlock
                                         "
                                     >
                                         {{ element[col] | date }}
                                     </div>
+                                    <ng-template #elseIfBlock>
+                                        <div
+                                            *ngIf="
+                                                col
+                                                    .toLowerCase()
+                                                    .includes('id');
+                                                else elseBlock
+                                            "
+                                        >
+                                            <div>
+                                                <mat-icon
+                                                    svgIcon="photoIcon"
+                                                    *ngIf="
+                                                        element[col];
+                                                        else elsePart1
+                                                    "
+                                                    (click)="viewAttachment(element[col])"
+                                                >
+                                                </mat-icon>
+                                                <ng-template #elsePart1>
+                                                    -
+                                                </ng-template>
+                                            </div>
+                                        </div>
+                                    </ng-template>
+                                    <ng-template #elseBlock>
+                                        {{ element[col] }}
+                                    </ng-template>
                                 </td>
                             </ng-container>
 
@@ -303,7 +327,10 @@
                                 </th>
                                 <td
                                     mat-cell
-                                    *matCellDef="let element; let index = index"
+                                    *matCellDef="
+                                        let element;
+                                        let index = dataIndex
+                                    "
                                     [formGroupName]="index"
                                 >
                                     <mat-form-field appearance="outline">
@@ -380,7 +407,10 @@
                                 </th>
                                 <td
                                     mat-cell
-                                    *matCellDef="let element; let index = index"
+                                    *matCellDef="
+                                        let element;
+                                        let index = dataIndex
+                                    "
                                     [formGroupName]="index"
                                 >
                                     <mat-form-field appearance="outline">
@@ -479,8 +509,8 @@
                                 <td
                                     mat-cell
                                     *matCellDef="
-                                        let elementlet;
-                                        let index = index
+                                        let element;
+                                        let index = dataIndex
                                     "
                                     [formGroupName]="index"
                                 >
@@ -513,7 +543,8 @@
                                     Warranty Details
                                 </th>
                                 <td mat-cell *matCellDef="let element">
-                                    <span class="viewLink"
+                                    <span
+                                        class="viewLink"
                                         (click)="
                                             expandedElement =
                                                 expandedElement === element
@@ -525,15 +556,14 @@
                                 </td>
                             </ng-container>
 
-                            <ng-container matColumnDef="expandedDetail">
+                            <ng-container matColumnDef="expandedDetails">
                                 <td
                                     mat-cell
                                     *matCellDef="let element"
                                     [attr.colspan]="displayedColumns.length"
                                 >
                                     <div
-                                        class="example-element-detail"
-                                        [@detailExpand]="
+                                        [@detailExpand1]="
                                             element == expandedElement
                                                 ? 'expanded'
                                                 : 'collapsed'
@@ -542,9 +572,11 @@
                                         <div
                                             class="p-12"
                                             *ngIf="
-                                                element.WARRANTY_REPLACEMENT_DETAILS != null &&
-                                                    element.WARRANTY_REPLACEMENT_DETAILS.length >
-                                                        0;
+                                                element.WARRANTY_REPLACEMENT_DETAILS !=
+                                                    null &&
+                                                    element
+                                                        .WARRANTY_REPLACEMENT_DETAILS
+                                                        .length > 0;
                                                 else elseBlock
                                             "
                                         >
@@ -553,9 +585,7 @@
                                                     <th>Total Qty</th>
                                                     <th>Billed Qty</th>
                                                     <th>Balance Qty</th>
-                                                    <th>
-                                                        Invoice No
-                                                    </th>
+                                                    <th>Invoice No</th>
                                                     <th>Supplied Qty</th>
                                                 </tr>
                                                 <tr
@@ -563,7 +593,11 @@
                                                         let lrData of element.WARRANTY_REPLACEMENT_DETAILS
                                                     "
                                                 >
-                                                    <td>{{ lrData.TOTAL_QUANTITY }}</td>
+                                                    <td>
+                                                        {{
+                                                            lrData.TOTAL_QUANTITY
+                                                        }}
+                                                    </td>
                                                     <td>
                                                         {{
                                                             lrData.BILLED_QUANTITY
@@ -575,9 +609,7 @@
                                                         }}
                                                     </td>
                                                     <td>
-                                                        {{
-                                                            lrData.INV_NO
-                                                        }}
+                                                        {{ lrData.INV_NO }}
                                                     </td>
                                                     <td>
                                                         {{
@@ -594,7 +626,10 @@
                                                 fxLayout="row"
                                                 fxLayoutAlign="center center"
                                             >
-                                                <span>No Warranty Replacement Details.</span>
+                                                <span
+                                                    >No Warranty Replacement
+                                                    Details.</span
+                                                >
                                             </div>
                                         </ng-template>
                                     </div>
@@ -621,7 +656,7 @@
                                 mat-row
                                 *matRowDef="
                                     let row;
-                                    columns: ['expandedDetail']
+                                    columns: ['expandedDetails']
                                 "
                                 class="example-detail-row"
                             ></tr>

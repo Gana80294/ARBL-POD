@@ -353,7 +353,7 @@ export class ReversePodUpdation {
     LR_NO: string;
     LR_DATE: Date | string | null;
     RPOD_HEADER_ID: number;
-    Status: number;
+    Code: number;
     DC_RECEIEVED_DATE: Date | string | null;
     DC_ACKNOWLEDGEMENT_DATE: Date | string | null;
     STATUS: string;
@@ -382,6 +382,12 @@ export class UpdateReverseLogistics {
     LR_DATE: Date | string | null;
     RECEIVED_QUANTITY: number;
     DC_RECEIEVED_DATE: Date | string | null;
+}
+
+export class AttachmentResponse {
+    FileName: string;
+    FileContent: any;
+    Extension: string;
 }
 
 // Region Reverse POD Ends
