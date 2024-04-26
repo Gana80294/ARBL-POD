@@ -41,6 +41,10 @@
                         <input placeholder="Customer Name" matInput formControlName="CustomerName" />
                     </mat-form-field>
 
+                    <mat-form-field fxFlex="20">
+                        <input placeholder="DC Number" matInput formControlName="DcNo" />
+                    </mat-form-field>
+
                     <div fxFlex class="mr-8 ml-24 mt-8">
                         <button mat-raised-button class="btnBg" (click)="filterAllReversePODs()">
                             Search
@@ -223,7 +227,7 @@
                                                     *ngIf="
                                                     lrData.CUSTOMER_DOC_ID;
                                                     else elsePart
-                                                ">
+                                                " (click)="viewAttachment(lrData.CUSTOMER_DOC_ID)">
                                                     </mat-icon>
                                                     <ng-template #elsePart> - </ng-template>
                                                 </div>
@@ -234,7 +238,7 @@
                                                     *ngIf="
                                                     lrData.DC_DOC_ID;
                                                     else elsePart1
-                                                ">
+                                                " (click)="viewAttachment(lrData.DC_DOC_ID)">
                                                     </mat-icon>
                                                     <ng-template #elsePart1> - </ng-template>
                                                 </div>

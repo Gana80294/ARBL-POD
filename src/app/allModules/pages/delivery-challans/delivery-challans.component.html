@@ -38,7 +38,7 @@
                     </mat-form-field>
 
                     <mat-form-field fxFlex="20" *ngIf="authenticationDetails.userRole == 'Amararaja User'">
-                        <input placeholder="Customer Code" matInput formControlName="UserCode" />
+                        <input placeholder="Customer Code" matInput formControlName="CustomerCode" />
                     </mat-form-field>
 
                     <mat-form-field fxFlex="20" *ngIf="authenticationDetails.userRole == 'Amararaja User'">
@@ -58,6 +58,10 @@
                         : 'none'
                 " [AllPlants]="AllPlantGroups" formControlName="PlantGroupList">
                     </app-custom-controls-plant-group>
+
+                    <mat-form-field fxFlex="20">
+                        <input placeholder="DC Number" matInput formControlName="DcNo" />
+                    </mat-form-field>
 
                     <div fxFlex class="mr-8 ml-24 mt-8">
                         <button mat-raised-button class="btnBg" (click)="filterAllReversePODs()">
