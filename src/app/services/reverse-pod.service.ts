@@ -111,12 +111,11 @@ export class ReversePodService {
             .pipe(catchError(this.errorHandler));
     }
 
-    DownloadRPODDocument(AttachmentID: number): Observable<Blob | string> {
+    DownloadRPODDocument(AttachmentID: number): Observable<any> {
         return this._httpClient
             .get(
-                `${this.baseAddress}api/ReversePOD/DownloadRPODDocument?AttachmentID=${AttachmentID}`,
+                `${this.baseAddress}api/ReversePOD/DownloadRPODDocuments?attachmentId=${AttachmentID}`,
                 {
-                    responseType: "blob",
                     headers: new HttpHeaders().append(
                         "Content-Type",
                         "application/json"
@@ -126,13 +125,21 @@ export class ReversePodService {
             .pipe(catchError(this.errorHandler));
     }
 
-    DownloadRpodReport(filterClass: ReversePODFilter): Observable<Blob | string> {
-        return this._httpClient.post(
-            `${this.baseAddress}api/ReversePOD/DownloadRPODReport`, filterClass,
-            {
-                responseType: 'blob',
-                headers: new HttpHeaders().append('Content-Type', 'application/json')
-            })
+    DownloadRpodReport(
+        filterClass: ReversePODFilter
+    ): Observable<Blob | string> {
+        return this._httpClient
+            .post(
+                `${this.baseAddress}api/ReversePOD/DownloadRPODReport`,
+                filterClass,
+                {
+                    responseType: "blob",
+                    headers: new HttpHeaders().append(
+                        "Content-Type",
+                        "application/json"
+                    ),
+                }
+            )
             .pipe(catchError(this.errorHandler));
     }
 
@@ -148,16 +155,14 @@ export class ReversePodService {
     GetIsApprover(UserId: Guid) {
         return this._httpClient
             .get<any>(
-                `${this.baseAddress}api/ReversePOD/GetIsApprover?UserId=${UserId}`,
+                `${this.baseAddress}api/ReversePOD/GetIsApprover?UserId=${UserId}`
             )
             .pipe(catchError(this.errorHandler));
     }
 
     GetDcApprovers() {
         return this._httpClient
-            .get<any>(
-                `${this.baseAddress}api/ReversePOD/GetDcApprovers`,
-            )
+            .get<any>(`${this.baseAddress}api/ReversePOD/GetDcApprovers`)
             .pipe(catchError(this.errorHandler));
     }
 
@@ -189,16 +194,20 @@ export class ReversePodService {
     }
 
     confirmReversePod(formData: FormData): Observable<any> {
-        return this._httpClient.post<any>(
-            `${this.baseAddress}api/ReversePOD/ConfirmReversePod`, formData
-        )
+        return this._httpClient
+            .post<any>(
+                `${this.baseAddress}api/ReversePOD/ConfirmReversePod`,
+                formData
+            )
             .pipe(catchError(this.errorHandler));
     }
 
     confirmReversePodDirectly(formData: FormData): Observable<any> {
-        return this._httpClient.post<any>(
-            `${this.baseAddress}api/ReversePOD/ConfirmReversePodDirectly`, formData
-        )
+        return this._httpClient
+            .post<any>(
+                `${this.baseAddress}api/ReversePOD/ConfirmReversePodDirectly`,
+                formData
+            )
             .pipe(catchError(this.errorHandler));
     }
 }

@@ -31,7 +31,10 @@ import {
     MatTableDataSource,
 } from "@angular/material";
 import { Router } from "@angular/router";
+import { AttachmentDialogComponent } from "app/allModules/reports/attachment-dialog/attachment-dialog.component";
 import {
+    AttachmentDetails,
+    AttachmentResponse,
     AttachmentStatus,
     InvoiceDetails,
     InvoiceItemDetails,
@@ -54,6 +57,7 @@ import { NotificationDialogComponent } from "app/notifications/notification-dial
 import { NotificationSnackBarComponent } from "app/notifications/notification-snack-bar/notification-snack-bar.component";
 import { SnackBarStatus } from "app/notifications/snackbar-status-enum";
 import { DashboardService } from "app/services/dashboard.service";
+import { FileSaverService } from "app/services/file-saver.service";
 import { InvoiceService } from "app/services/invoice.service";
 import { MasterService } from "app/services/master.service";
 import { ReversePodService } from "app/services/reverse-pod.service";
@@ -174,16 +178,13 @@ export class ReverseLogisticsItemComponent implements OnInit {
         private _router: Router,
         private _dashboardService: DashboardService,
         private _shareParameterService: ShareParameterService,
-        private _invoiceService: InvoiceService,
-        private _masterService: MasterService,
         public snackBar: MatSnackBar,
         private dialog: MatDialog,
         private _formBuilder: FormBuilder,
         private _datePipe: DatePipe,
-        private _decimalPipe: DecimalPipe,
-        private renderer: Renderer,
-        private _reversePodService: ReversePodService
-    ) { }
+        private _reversePodService: ReversePodService,
+        private _fileSaver: FileSaverService
+    ) {}
 
     ngOnInit(): void {
         // Retrive authorizationData
@@ -232,8 +233,6 @@ export class ReverseLogisticsItemComponent implements OnInit {
         this.getReversePodLRDetails(
             this.selectedReverseLogisticDetail.RPOD_HEADER_ID
         );
-
-
     }
 
     addRpodForm(materialDetail: ReversePodMaterialDetail) {
@@ -247,7 +246,7 @@ export class ReverseLogisticsItemComponent implements OnInit {
                 : materialDetail.QUANTITY;
         }
 
-        console.log(materialDetail.HAND_OVERED_QUANTITY)
+        console.log(materialDetail.HAND_OVERED_QUANTITY);
         let materialForm = this._formBuilder.group({
             HAND_OVERED_QUANTITY: [
                 materialDetail.HAND_OVERED_QUANTITY
@@ -287,12 +286,14 @@ export class ReverseLogisticsItemComponent implements OnInit {
                         this.addRpodForm(element);
                     });
                     console.log(this.reverseLogisticsItemFormGroup);
+                    console.log(this.rPodMaterialDetails);
                     this.dataSource = new MatTableDataSource(
                         this.rPodMaterialDetails
                     );
+                    console.log(this.dataSource);
                 }
             },
-            (err) => { }
+            (err) => {}
         );
     }
 
@@ -305,13 +306,15 @@ export class ReverseLogisticsItemComponent implements OnInit {
                     );
                 }
             },
-            (err) => { }
+            (err) => {}
         );
     }
 
     handOveredQtyValidation(event, actualQty: number, index: number) {
         let handOveredQty = event.target.value;
-
+        console.log(this.dataSource);
+        console.log(handOveredQty, actualQty, index);
+        console.log(this.dataSource.data[index]);
         if (handOveredQty == actualQty) {
             this.dataSource.data[index].STATUS = "Confirmed";
         } else if (handOveredQty < actualQty) {
@@ -377,7 +380,7 @@ export class ReverseLogisticsItemComponent implements OnInit {
             } else if (
                 this.currentUserRole != "Customer" &&
                 rPOdFormArray[i].value.HAND_OVERED_QUANTITY <
-                rPOdFormArray[i].value.RECEIVED_QUANTITY
+                    rPOdFormArray[i].value.RECEIVED_QUANTITY
             ) {
                 return false;
             } else if (rPOdFormArray[i].value.RECEIVED_QUANTITY < 0) {
@@ -443,10 +446,10 @@ export class ReverseLogisticsItemComponent implements OnInit {
             this.currentUserRole == "Customer"
                 ? "In Transit"
                 : this.dataSource.data.some((x) =>
-                    x.STATUS.toLowerCase().includes("partially confirmed")
-                )
-                    ? "Partially Confirmed"
-                    : "Confirmed";
+                      x.STATUS.toLowerCase().includes("partially confirmed")
+                  )
+                ? "Partially Confirmed"
+                : "Confirmed";
 
         const RPODFORMARRAY = this.reverseLogisticsItemFormGroup.get(
             "RPodItemArray"
@@ -586,18 +589,63 @@ export class ReverseLogisticsItemComponent implements OnInit {
     }
 
     isVisible() {
-        if (this.currentUserRole == 'Customer') {
-            return (this.selectedReverseLogisticDetail.STATUS.toLowerCase() == 'open' ||
-                this.selectedReverseLogisticDetail.STATUS.toLowerCase() == 'partially confirmed'); 
-                 
-              
-        }
-        else if (this.currentUserRole.toLowerCase() == 'amararaja user') {
-            return (this.selectedReverseLogisticDetail.STATUS.toLowerCase() == 'in transit' ||
-                this.selectedReverseLogisticDetail.STATUS.toLowerCase() == 'partially confirmed'); 
-        }
-        else {
+        if (this.currentUserRole == "Customer") {
+            return (
+                this.selectedReverseLogisticDetail.STATUS.toLowerCase() ==
+                    "open" ||
+                this.selectedReverseLogisticDetail.STATUS.toLowerCase() ==
+                    "partially confirmed"
+            );
+        } else if (this.currentUserRole.toLowerCase() == "amararaja user") {
+            return (
+                this.selectedReverseLogisticDetail.STATUS.toLowerCase() ==
+                    "in transit" ||
+                this.selectedReverseLogisticDetail.STATUS.toLowerCase() ==
+                    "partially confirmed"
+            );
+        } else {
             return false;
         }
+    }
+
+    viewAttachment(id: number) {
+        this.isProgressBarVisibile = true;
+        this._reversePodService.DownloadRPODDocument(id).subscribe({
+            next: (res) => {
+                this.isProgressBarVisibile = false;
+                if (res) {
+                    this.openAttachmentDialog(res as AttachmentResponse);
+                }
+            },
+            error: (err) => {
+                this.isProgressBarVisibile = false;
+                this.notificationSnackBarComponent.openSnackBar(
+                    err.toString(),
+                    SnackBarStatus.danger
+                );
+            },
+        });
+    }
+
+    openAttachmentDialog(fileData: AttachmentResponse) {
+        const BLOB = this._fileSaver.getBlobData(fileData);
+        const attachmentDetails: AttachmentDetails = {
+            FileName: fileData.FileName,
+            blob: BLOB,
+        };
+
+        const DIALOG_CONFIG: MatDialogConfig = {
+            data: attachmentDetails,
+            panelClass: "attachment-dialog",
+        };
+        const DIALOG_REF = this.dialog.open(
+            AttachmentDialogComponent,
+            DIALOG_CONFIG
+        );
+
+        DIALOG_REF.afterClosed().subscribe({
+            next: (res) => {},
+            error: (err) => {},
+        });
     }
 }

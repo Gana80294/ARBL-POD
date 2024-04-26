@@ -384,4 +384,10 @@ export class UpdateReverseLogistics {
     DC_RECEIEVED_DATE: Date | string | null;
 }
 
+export class AttachmentResponse {
+    FileName: string;
+    FileContent: any;
+    Extension: string;
+}
+
 // Region Reverse POD Ends

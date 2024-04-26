@@ -7,31 +7,51 @@
                 </div>
                 <div fxFlex fxLayoutAlign="end">
                     <!-- Confirm btn -->
-                    <button *ngIf="
-                            isVisible()
-                        " mat-raised-button class="mr-4 confirmBtn" (click)="confirmReversePOD()">
+                    <button
+                        *ngIf="isVisible()"
+                        mat-raised-button
+                        class="mr-4 confirmBtn"
+                        (click)="confirmReversePOD()"
+                    >
                         Confirm
                     </button>
 
                     <!-- amararaja user confirm qty btn -->
-                    <button *ngIf="
+                    <button
+                        *ngIf="
                             (currentUserRole | lowercase) ===
                                 'amararaja user' &&
                             (selectedReverseLogisticDetail?.STATUS
                                 | lowercase) === 'partially confirmed'
-                        " mat-raised-button class="mr-4 confirmBtn">
+                        "
+                        mat-raised-button
+                        class="mr-4 confirmBtn"
+                    >
                         Confirm Qty
                     </button>
 
-                    <input hidden onclick="this.value=null" type="file"
-                        accept="application/pdf,image/jpg,image/jpeg,.png,image/*" #reversePodFileInput
-                        id="reversePodFile" (change)="handleFileInput($event)" />
+                    <input
+                        hidden
+                        onclick="this.value=null"
+                        type="file"
+                        accept="application/pdf,image/jpg,image/jpeg,.png,image/*"
+                        #reversePodFileInput
+                        id="reversePodFile"
+                        (change)="handleFileInput($event)"
+                    />
                 </div>
             </div>
         </mat-card>
         <div class="sidenav-content">
-            <form name="form" [formGroup]="reverseLogisticsItemFormGroup" fxLayout="column" fxLayoutAlign="start"
-                fxFlex="100" class="abnormal" id="abnormal">
+            <form
+                name="form"
+                [formGroup]="reverseLogisticsItemFormGroup"
+                fxLayout="column"
+                fxLayoutAlign="start"
+                fxFlex="100"
+                class="abnormal"
+                id="abnormal"
+            >
                 <!-- <div class="m-0 p-0 mr-8"> -->
                 <div fxFlex fxLayout="row" class="borderTop mt-4">
                     <table class="customtable">
@@ -53,7 +73,7 @@
                             <tr>
                                 <td>
                                     {{
-                                    selectedReverseLogisticDetail?.DC_NUMBER
+                                        selectedReverseLogisticDetail?.DC_NUMBER
                                     }}
                                 </td>
                                 <td>
@@ -61,77 +81,115 @@
                                 </td>
                                 <td>
                                     {{
-                                    selectedReverseLogisticDetail?.CLAIM_TYPE
+                                        selectedReverseLogisticDetail?.CLAIM_TYPE
                                     }}
                                 </td>
                                 <td>
                                     {{
-                                    selectedReverseLogisticDetail?.CUSTOMER_NAME
+                                        selectedReverseLogisticDetail?.CUSTOMER_NAME
                                     }}
                                 </td>
                                 <td>
                                     {{
-                                    selectedReverseLogisticDetail?.PLANT_NAME
+                                        selectedReverseLogisticDetail?.PLANT_NAME
                                     }}
                                 </td>
                                 <td>
                                     <mat-form-field appearance="outline">
-                                        <input matInput type="text" formControlName="LR_NO" />
+                                        <input
+                                            matInput
+                                            type="text"
+                                            formControlName="LR_NO"
+                                        />
                                     </mat-form-field>
-                                    <mat-error *ngIf="
+                                    <mat-error
+                                        *ngIf="
                                             reverseLogisticsItemFormGroup.get(
                                                 'LR_NO'
                                             ).touched &&
                                             reverseLogisticsItemFormGroup
                                                 .get('LR_NO')
                                                 .hasError('required')
-                                        " class="mat-err-msg">
+                                        "
+                                        class="mat-err-msg"
+                                    >
                                         Required
                                     </mat-error>
                                 </td>
                                 <td>
                                     <mat-form-field appearance="outline">
-                                        <input readonly matInput [matDatepicker]="pickerLrDate"
-                                            formControlName="LR_DATE" (click)="pickerLrDate.open()" />
-                                        <mat-datepicker-toggle matSuffix [for]="pickerLrDate">
+                                        <input
+                                            readonly
+                                            matInput
+                                            [matDatepicker]="pickerLrDate"
+                                            formControlName="LR_DATE"
+                                            (click)="pickerLrDate.open()"
+                                        />
+                                        <mat-datepicker-toggle
+                                            matSuffix
+                                            [for]="pickerLrDate"
+                                        >
                                         </mat-datepicker-toggle>
-                                        <mat-datepicker #pickerLrDate></mat-datepicker>
+                                        <mat-datepicker
+                                            #pickerLrDate
+                                        ></mat-datepicker>
                                     </mat-form-field>
-                                    <mat-error *ngIf="
+                                    <mat-error
+                                        *ngIf="
                                             reverseLogisticsItemFormGroup.get(
                                                 'LR_DATE'
                                             ).touched &&
                                             reverseLogisticsItemFormGroup
                                                 .get('LR_DATE')
                                                 .hasError('required')
-                                        " class="mat-err-msg">
+                                        "
+                                        class="mat-err-msg"
+                                    >
                                         Required
                                     </mat-error>
                                 </td>
                                 <td>
-                                    <mat-form-field class="pl-8 pr-12" appearance="outline">
-                                        <input matInput readOnly [matDatepicker]="pickerdcReceDate"
-                                            formControlName="DC_RECEIEVED_DATE" [disabled]="
+                                    <mat-form-field
+                                        class="pl-8 pr-12"
+                                        appearance="outline"
+                                    >
+                                        <input
+                                            matInput
+                                            readOnly
+                                            [matDatepicker]="pickerdcReceDate"
+                                            formControlName="DC_RECEIEVED_DATE"
+                                            [disabled]="
                                                 currentUserRole == 'Customer'
-                                            " readonly (click)="pickerdcReceDate.open()" />
-                                        <mat-datepicker-toggle matSuffix [for]="pickerdcReceDate">
+                                            "
+                                            readonly
+                                            (click)="pickerdcReceDate.open()"
+                                        />
+                                        <mat-datepicker-toggle
+                                            matSuffix
+                                            [for]="pickerdcReceDate"
+                                        >
                                         </mat-datepicker-toggle>
-                                        <mat-datepicker #pickerdcReceDate></mat-datepicker>
+                                        <mat-datepicker
+                                            #pickerdcReceDate
+                                        ></mat-datepicker>
                                     </mat-form-field>
-                                    <mat-error *ngIf="
+                                    <mat-error
+                                        *ngIf="
                                             reverseLogisticsItemFormGroup.get(
                                                 'DC_RECEIEVED_DATE'
                                             ).touched &&
                                             reverseLogisticsItemFormGroup
                                                 .get('DC_RECEIEVED_DATE')
                                                 .hasError('required')
-                                        " class="pl-8 mat-err-msg">
+                                        "
+                                        class="pl-8 mat-err-msg"
+                                    >
                                         Required
                                     </mat-error>
                                 </td>
                                 <td>
                                     {{
-                                    selectedReverseLogisticDetail?.DC_ACKNOWLEDGEMENT_DATE
+                                        selectedReverseLogisticDetail?.DC_ACKNOWLEDGEMENT_DATE
                                     }}
                                 </td>
                                 <td>
@@ -146,14 +204,18 @@
                     <div fxLayoutAlign="start center" class="pt-8 mb-8">
                         <span class="orangeBorderBottom h2"> LR DETAILS </span>
                     </div>
-                    <div class="example-container table-responsive rpod-detail-table">
+                    <div
+                        class="example-container table-responsive rpod-detail-table"
+                    >
                         <table mat-table [dataSource]="LrDetailDataSource">
-                            <ng-container *ngFor="let col of LrDetailsDisplayColumns" matColumnDef="{{ col }}">
+                            <ng-container
+                                *ngFor="let col of LrDetailsDisplayColumns"
+                                matColumnDef="{{ col }}"
+                            >
                                 <th mat-header-cell *matHeaderCellDef>
                                     {{ LrDetailColNames[col] }}
                                 </th>
                                 <td mat-cell *matCellDef="let element">
-
                                     <!-- <div
                                         *ngIf="
                                             !col.toLowerCase().includes('date')
@@ -162,32 +224,56 @@
                                     >
                                         {{ element[col] }}
                                     </div> -->
-                                    <div *ngIf="
-                                            col.toLowerCase().includes('date'); else elseIfBlock
-                                        ">
+                                    <div
+                                        *ngIf="
+                                            col.toLowerCase().includes('date');
+                                            else elseIfBlock
+                                        "
+                                    >
                                         {{ element[col] | date }}
                                     </div>
                                     <ng-template #elseIfBlock>
-                                        <div *ngIf="col.toLowerCase().includes('id'); else elseBlock">
+                                        <div
+                                            *ngIf="
+                                                col
+                                                    .toLowerCase()
+                                                    .includes('id');
+                                                else elseBlock
+                                            "
+                                        >
                                             <div>
-                                                <mat-icon svgIcon="photoIcon" *ngIf="
-                                                element[col];
-                                                else elsePart1
-                                            ">
+                                                <mat-icon
+                                                    svgIcon="photoIcon"
+                                                    *ngIf="
+                                                        element[col];
+                                                        else elsePart1
+                                                    "
+                                                    (click)="viewAttachment(element[col])"
+                                                >
                                                 </mat-icon>
-                                                <ng-template #elsePart1> - </ng-template>
+                                                <ng-template #elsePart1>
+                                                    -
+                                                </ng-template>
                                             </div>
                                         </div>
                                     </ng-template>
-                                    <ng-template #elseBlock> {{ element[col] }} </ng-template>
+                                    <ng-template #elseBlock>
+                                        {{ element[col] }}
+                                    </ng-template>
                                 </td>
                             </ng-container>
 
-                            <tr mat-header-row *matHeaderRowDef="LrDetailsDisplayColumns"></tr>
-                            <tr mat-row *matRowDef="
+                            <tr
+                                mat-header-row
+                                *matHeaderRowDef="LrDetailsDisplayColumns"
+                            ></tr>
+                            <tr
+                                mat-row
+                                *matRowDef="
                                     let element;
                                     columns: LrDetailsDisplayColumns
-                                "></tr>
+                                "
+                            ></tr>
                         </table>
                     </div>
                 </div>
@@ -198,15 +284,25 @@
                             ITEM DETAILS
                         </span>
                     </div>
-                    <div class="example-container table-responsive rpod-detail-table">
-                        <table class="table" mat-table [dataSource]="dataSource" formArrayName="RPodItemArray"
-                            multiTemplateDataRows>
+                    <div
+                        class="example-container table-responsive rpod-detail-table"
+                    >
+                        <table
+                            class="table"
+                            mat-table
+                            [dataSource]="dataSource"
+                            formArrayName="RPodItemArray"
+                            multiTemplateDataRows
+                        >
                             <!-- Material Code column -->
                             <ng-container matColumnDef="MATERIAL_CODE">
                                 <th mat-header-cell *matHeaderCellDef>
                                     Item Number
                                 </th>
-                                <td mat-cell *matCellDef="let element; let index = index">
+                                <td
+                                    mat-cell
+                                    *matCellDef="let element; let index = index"
+                                >
                                     {{ element.MATERIAL_CODE }}
                                 </td>
                             </ng-container>
@@ -216,7 +312,10 @@
                                 <th mat-header-cell *matHeaderCellDef>
                                     Quantity
                                 </th>
-                                <td mat-cell *matCellDef="let element; let index = index">
+                                <td
+                                    mat-cell
+                                    *matCellDef="let element; let index = index"
+                                >
                                     {{ element.QUANTITY }}
                                 </td>
                             </ng-container>
@@ -226,28 +325,47 @@
                                 <th mat-header-cell *matHeaderCellDef>
                                     Hand Overed Quantity
                                 </th>
-                                <td mat-cell *matCellDef="let element; let index = dataIndex" [formGroupName]="index">
+                                <td
+                                    mat-cell
+                                    *matCellDef="
+                                        let element;
+                                        let index = dataIndex
+                                    "
+                                    [formGroupName]="index"
+                                >
                                     <mat-form-field appearance="outline">
-                                        <input matInput type="number" #handOveredQty
-                                            formControlName="HAND_OVERED_QUANTITY" (input)="
+                                        <input
+                                            matInput
+                                            type="number"
+                                            #handOveredQty
+                                            formControlName="HAND_OVERED_QUANTITY"
+                                            (input)="
                                                 handOveredQtyValidation(
                                                     $event,
                                                     element.QUANTITY,
                                                     index
                                                 )
-                                            " />
+                                            "
+                                        />
                                     </mat-form-field>
-                                    <mat-error *ngIf="
+                                    <mat-error
+                                        *ngIf="
                                             element.QUANTITY <
                                             handOveredQty.value
-                                        " class="mat-err-msg">
+                                        "
+                                        class="mat-err-msg"
+                                    >
                                         Hand overed Qty is higher than the
                                         Actual Qty
                                     </mat-error>
-                                    <mat-error *ngIf="handOveredQty.value < 0" class="mat-err-msg">
+                                    <mat-error
+                                        *ngIf="handOveredQty.value < 0"
+                                        class="mat-err-msg"
+                                    >
                                         Value can't be negative
                                     </mat-error>
-                                    <mat-error *ngIf="
+                                    <mat-error
+                                        *ngIf="
                                             reverseLogisticsItemFormGroup
                                                 .get('RPodItemArray')
                                                 ['controls'][index]?.get(
@@ -259,18 +377,25 @@
                                                     'HAND_OVERED_QUANTITY'
                                                 )
                                                 ?.hasError('required')
-                                        " class="mat-err-msg">
+                                        "
+                                        class="mat-err-msg"
+                                    >
                                         Required
                                     </mat-error>
                                 </td>
                             </ng-container>
 
                             <!-- CUSTOMER_PENDING_QUANTITY column -->
-                            <ng-container matColumnDef="CUSTOMER_PENDING_QUANTITY">
+                            <ng-container
+                                matColumnDef="CUSTOMER_PENDING_QUANTITY"
+                            >
                                 <th mat-header-cell *matHeaderCellDef>
                                     Customer Pending Quantity
                                 </th>
-                                <td mat-cell *matCellDef="let element; let index = index">
+                                <td
+                                    mat-cell
+                                    *matCellDef="let element; let index = index"
+                                >
                                     {{ element.CUSTOMER_PENDING_QUANTITY }}
                                 </td>
                             </ng-container>
@@ -280,9 +405,20 @@
                                 <th mat-header-cell *matHeaderCellDef>
                                     Received Quantity
                                 </th>
-                                <td mat-cell *matCellDef="let element; let index = dataIndex" [formGroupName]="index">
+                                <td
+                                    mat-cell
+                                    *matCellDef="
+                                        let element;
+                                        let index = dataIndex
+                                    "
+                                    [formGroupName]="index"
+                                >
                                     <mat-form-field appearance="outline">
-                                        <input matInput type="number" #receivedQty formControlName="RECEIVED_QUANTITY"
+                                        <input
+                                            matInput
+                                            type="number"
+                                            #receivedQty
+                                            formControlName="RECEIVED_QUANTITY"
                                             (input)="
                                                 receivedQtyValidation(
                                                     $event,
@@ -296,19 +432,24 @@
                                                     element.QUANTITY,
                                                     index
                                                 )
-                                            " />
+                                            "
+                                        />
                                     </mat-form-field>
-                                    <mat-error *ngIf="
+                                    <mat-error
+                                        *ngIf="
                                             reverseLogisticsItemFormGroup
                                                 .get('RPodItemArray')
                                                 ['controls'][index]?.get(
                                                     'HAND_OVERED_QUANTITY'
                                                 )?.value < receivedQty.value
-                                        " class="mat-err-msg">
+                                        "
+                                        class="mat-err-msg"
+                                    >
                                         Received Qty is higher than the Hand
                                         overed Qty
                                     </mat-error>
-                                    <mat-error *ngIf="
+                                    <mat-error
+                                        *ngIf="
                                             reverseLogisticsItemFormGroup
                                                 .get('RPodItemArray')
                                                 ['controls'][index]?.get(
@@ -320,10 +461,15 @@
                                                     'RECEIVED_QUANTITY'
                                                 )
                                                 ?.hasError('required')
-                                        " class="mat-err-msg">
+                                        "
+                                        class="mat-err-msg"
+                                    >
                                         Required
                                     </mat-error>
-                                    <mat-error *ngIf="receivedQty.value < 0" class="mat-err-msg">
+                                    <mat-error
+                                        *ngIf="receivedQty.value < 0"
+                                        class="mat-err-msg"
+                                    >
                                         Value can't be negative
                                     </mat-error>
                                 </td>
@@ -334,7 +480,10 @@
                                 <th mat-header-cell *matHeaderCellDef>
                                     DC Pending Quantity
                                 </th>
-                                <td mat-cell *matCellDef="let element; let index = index">
+                                <td
+                                    mat-cell
+                                    *matCellDef="let element; let index = index"
+                                >
                                     {{ element.DC_PENDING_QUANTITY }}
                                 </td>
                             </ng-container>
@@ -344,7 +493,10 @@
                                 <th mat-header-cell *matHeaderCellDef>
                                     Status
                                 </th>
-                                <td mat-cell *matCellDef="let element; let index = index">
+                                <td
+                                    mat-cell
+                                    *matCellDef="let element; let index = index"
+                                >
                                     {{ element.STATUS }}
                                 </td>
                             </ng-container>
@@ -354,17 +506,30 @@
                                 <th mat-header-cell *matHeaderCellDef>
                                     Remarks
                                 </th>
-                                <td mat-cell *matCellDef="
+                                <td
+                                    mat-cell
+                                    *matCellDef="
                                         let element;
                                         let index = dataIndex
-                                    " [formGroupName]="index">
+                                    "
+                                    [formGroupName]="index"
+                                >
                                     <mat-form-field appearance="outline">
-                                        <input matInput type="text" formControlName="REMARKS"
-                                            [matAutocomplete]="auto" />
-                                        <mat-autocomplete #auto="matAutocomplete">
-                                            <mat-option *ngFor="
+                                        <input
+                                            matInput
+                                            type="text"
+                                            formControlName="REMARKS"
+                                            [matAutocomplete]="auto"
+                                        />
+                                        <mat-autocomplete
+                                            #auto="matAutocomplete"
+                                        >
+                                            <mat-option
+                                                *ngFor="
                                                     let opt of remarkOptions
-                                                " [value]="opt">
+                                                "
+                                                [value]="opt"
+                                            >
                                                 {{ opt }}
                                             </mat-option>
                                         </mat-autocomplete>
@@ -378,93 +543,135 @@
                                     Warranty Details
                                 </th>
                                 <td mat-cell *matCellDef="let element">
-                                    <span class="viewLink" (click)="
+                                    <span
+                                        class="viewLink"
+                                        (click)="
                                             expandedElement =
                                                 expandedElement === element
                                                     ? null
                                                     : element
-                                        ">view</span>
+                                        "
+                                        >view</span
+                                    >
                                 </td>
                             </ng-container>
 
                             <ng-container matColumnDef="expandedDetails">
-                                <td mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns.length">
-                                    <div [@detailExpand1]="
+                                <td
+                                    mat-cell
+                                    *matCellDef="let element"
+                                    [attr.colspan]="displayedColumns.length"
+                                >
+                                    <div
+                                        [@detailExpand1]="
                                             element == expandedElement
                                                 ? 'expanded'
                                                 : 'collapsed'
-                                        ">
-                                        <div class="p-12" *ngIf="
-                                                element.WARRANTY_REPLACEMENT_DETAILS != null &&
-                                                    element.WARRANTY_REPLACEMENT_DETAILS.length >
-                                                        0;
+                                        "
+                                    >
+                                        <div
+                                            class="p-12"
+                                            *ngIf="
+                                                element.WARRANTY_REPLACEMENT_DETAILS !=
+                                                    null &&
+                                                    element
+                                                        .WARRANTY_REPLACEMENT_DETAILS
+                                                        .length > 0;
                                                 else elseBlock
-                                            ">
+                                            "
+                                        >
                                             <table class="lr-table">
                                                 <tr>
                                                     <th>Total Qty</th>
                                                     <th>Billed Qty</th>
                                                     <th>Balance Qty</th>
-                                                    <th>
-                                                        Invoice No
-                                                    </th>
+                                                    <th>Invoice No</th>
                                                     <th>Supplied Qty</th>
                                                 </tr>
-                                                <tr *ngFor="
+                                                <tr
+                                                    *ngFor="
                                                         let lrData of element.WARRANTY_REPLACEMENT_DETAILS
-                                                    ">
-                                                    <td>{{ lrData.TOTAL_QUANTITY }}</td>
+                                                    "
+                                                >
                                                     <td>
                                                         {{
-                                                        lrData.BILLED_QUANTITY
+                                                            lrData.TOTAL_QUANTITY
                                                         }}
                                                     </td>
                                                     <td>
                                                         {{
-                                                        lrData.BALANCE_QUANTITY
+                                                            lrData.BILLED_QUANTITY
                                                         }}
                                                     </td>
                                                     <td>
                                                         {{
-                                                        lrData.INV_NO
+                                                            lrData.BALANCE_QUANTITY
                                                         }}
                                                     </td>
                                                     <td>
+                                                        {{ lrData.INV_NO }}
+                                                    </td>
+                                                    <td>
                                                         {{
-                                                        lrData.SUPPLIED_QUANTITY
+                                                            lrData.SUPPLIED_QUANTITY
                                                         }}
                                                     </td>
                                                 </tr>
                                             </table>
                                         </div>
                                         <ng-template #elseBlock>
-                                            <div class="p-12" fxFlex="100" fxLayout="row" fxLayoutAlign="center center">
-                                                <span>No Warranty Replacement Details.</span>
+                                            <div
+                                                class="p-12"
+                                                fxFlex="100"
+                                                fxLayout="row"
+                                                fxLayoutAlign="center center"
+                                            >
+                                                <span
+                                                    >No Warranty Replacement
+                                                    Details.</span
+                                                >
                                             </div>
                                         </ng-template>
                                     </div>
                                 </td>
                             </ng-container>
 
-                            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                            <tr mat-row *matRowDef="
+                            <tr
+                                mat-header-row
+                                *matHeaderRowDef="displayedColumns"
+                            ></tr>
+                            <tr
+                                mat-row
+                                *matRowDef="
                                     let row;
                                     columns: displayedColumns;
                                     let index = index
-                                " class="example-element-row" [class.example-expanded-row]="
+                                "
+                                class="example-element-row"
+                                [class.example-expanded-row]="
                                     expandedElement === element
-                                "></tr>
-                            <tr mat-row *matRowDef="
+                                "
+                            ></tr>
+                            <tr
+                                mat-row
+                                *matRowDef="
                                     let row;
                                     columns: ['expandedDetails']
-                                " class="example-detail-row"></tr>
+                                "
+                                class="example-detail-row"
+                            ></tr>
                         </table>
                     </div>
                 </div>
             </form>
         </div>
     </div>
-    <mat-progress-spinner *ngIf="isProgressBarVisibile" class="progressBarPostion" color="accent" mode="indeterminate">
+    <mat-progress-spinner
+        *ngIf="isProgressBarVisibile"
+        class="progressBarPostion"
+        color="accent"
+        mode="indeterminate"
+    >
     </mat-progress-spinner>
     <div id="overlay" *ngIf="isProgressBarVisibile"></div>
 </div>
