@@ -16,20 +16,6 @@
                         Confirm
                     </button>
 
-                    <!-- amararaja user confirm qty btn -->
-                    <button
-                        *ngIf="
-                            (currentUserRole | lowercase) ===
-                                'amararaja user' &&
-                            (selectedReverseLogisticDetail?.STATUS
-                                | lowercase) === 'partially confirmed'
-                        "
-                        mat-raised-button
-                        class="mr-4 confirmBtn"
-                    >
-                        Confirm Qty
-                    </button>
-
                     <input
                         hidden
                         onclick="this.value=null"
@@ -586,7 +572,6 @@
                                                     <th>Billed Qty</th>
                                                     <th>Balance Qty</th>
                                                     <th>Invoice No</th>
-                                                    <th>Supplied Qty</th>
                                                 </tr>
                                                 <tr
                                                     *ngFor="
@@ -610,11 +595,6 @@
                                                     </td>
                                                     <td>
                                                         {{ lrData.INV_NO }}
-                                                    </td>
-                                                    <td>
-                                                        {{
-                                                            lrData.SUPPLIED_QUANTITY
-                                                        }}
                                                     </td>
                                                 </tr>
                                             </table>

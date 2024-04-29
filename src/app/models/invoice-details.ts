@@ -338,13 +338,14 @@ export class WarrantyReplacement {
 
 export class ReversePODFilter {
     UserID: Guid;
-    UserCode: string;
     StartDate: Date | string | null;
     EndDate: Date | string | null;
     Status: string[] = [];
     PlantList: string[] = [];
     PlantGroupList: string[] = [];
     CustomerName: string;
+    CustomerCode: string;
+    DcNo:string;
     CurrentPage: number;
     Records: number;
 }

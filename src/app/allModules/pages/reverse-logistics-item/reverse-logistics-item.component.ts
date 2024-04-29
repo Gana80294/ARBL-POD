@@ -599,6 +599,8 @@ export class ReverseLogisticsItemComponent implements OnInit {
         } else if (this.currentUserRole.toLowerCase() == "amararaja user") {
             return (
                 this.selectedReverseLogisticDetail.STATUS.toLowerCase() ==
+                    "open" ||
+                this.selectedReverseLogisticDetail.STATUS.toLowerCase() ==
                     "in transit" ||
                 this.selectedReverseLogisticDetail.STATUS.toLowerCase() ==
                     "partially confirmed"
