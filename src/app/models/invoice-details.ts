@@ -276,6 +276,39 @@ export class ReversePOD {
     DC_ACKNOWLEDGEMENT_DATE: Date | string | null;
     SLA_DATE: Date | string | null;
     PENDING_DAYS: number;
+    TOTAL_QUANTITY: number;
+    BILLED_QUANTITY: number;
+    BALANCE_QUANTITY: number;
+}
+
+export class ReversePODDashboard {
+    RPOD_HEADER_ID: number;
+    DC_NUMBER: string;
+    DC_DATE: Date;
+    INV_NO: string;
+    CLAIM_TYPE: string;
+    CUSTOMER: string;
+    CUSTOMER_NAME: string;
+    PLANT: string;
+    PLANT_NAME: string;
+    STATUS: string;
+    SLA_DATE: Date | string | null;
+    PENDING_DAYS: number;
+    TOTAL_QUANTITY: number;
+    BILLED_QUANTITY: number;
+    BALANCE_QUANTITY: number;
+    LR_DETAILS: ReversePodLrDetails[] = [];
+}
+
+export class ReversePodLrDetails {
+    LR_ID: number;
+    RPOD_HEADER_ID: number;
+    LR_NO: string;
+    LR_DATE: Date | string | null;
+    DC_RECEIEVED_DATE: Date | string | null;
+    DC_ACKNOWLEDGEMENT_DATE: Date | string | null;
+    CUSTOMER_DOC_ID: number;
+    DC_DOC_ID: number;
 }
 
 export class ReversePodMaterialDetail {
@@ -289,17 +322,30 @@ export class ReversePodMaterialDetail {
     DC_PENDING_QUANTITY: number;
     STATUS: string;
     REMARKS: string;
+    WARRANTY_REPLACEMENT_DETAILS: WarrantyReplacement[] = [];
+}
+
+export class WarrantyReplacement {
+    Id: number;
+    RPOD_HEADER_ID: number;
+    MATERIAL_CODE: string;
+    TOTAL_QUANTITY: number;
+    BILLED_QUANTITY: number;
+    BALANCE_QUANTITY: number;
+    INV_NO: string;
+    SUPPLIED_QUANTITY: number;
 }
 
 export class ReversePODFilter {
     UserID: Guid;
-    UserCode: string;
     StartDate: Date | string | null;
     EndDate: Date | string | null;
     Status: string[] = [];
     PlantList: string[] = [];
     PlantGroupList: string[] = [];
     CustomerName: string;
+    CustomerCode: string;
+    DcNo:string;
     CurrentPage: number;
     Records: number;
 }
@@ -308,11 +354,11 @@ export class ReversePodUpdation {
     LR_NO: string;
     LR_DATE: Date | string | null;
     RPOD_HEADER_ID: number;
-    Status: number;
+    Code: number;
     DC_RECEIEVED_DATE: Date | string | null;
     DC_ACKNOWLEDGEMENT_DATE: Date | string | null;
     STATUS: string;
-    MATERIALS: ReversePodItemUpdation[] =[];
+    MATERIALS: ReversePodItemUpdation[] = [];
 }
 
 export class ReversePodItemUpdation {
@@ -337,6 +383,12 @@ export class UpdateReverseLogistics {
     LR_DATE: Date | string | null;
     RECEIVED_QUANTITY: number;
     DC_RECEIEVED_DATE: Date | string | null;
+}
+
+export class AttachmentResponse {
+    FileName: string;
+    FileContent: any;
+    Extension: string;
 }
 
 // Region Reverse POD Ends

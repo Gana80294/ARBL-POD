@@ -35,6 +35,19 @@
         overflow: auto;
     }
 
+    .lr-table {
+        width: 70%;
+        margin-left: 15%;
+        box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px,
+            rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
+    }
+
+    .viewLink {
+        text-decoration: underline;
+        color: blue;
+        cursor: pointer;
+    }
+
     .table {
         width: 100%;
 
@@ -57,10 +70,26 @@
         tr {
             height: 50px;
         }
+
+        tr.example-detail-row {
+            height: 0;
+        }
+
+        tr.example-element-row:not(.example-expanded-row):hover {
+            background: #f5f5f5;
+        }
+
+        tr.example-element-row:not(.example-expanded-row):active {
+            background: #efefef;
+        }
+
+        .example-element-row td {
+            border-bottom-width: 0;
+        }
     }
 
     .abnormal {
-        .mat-form-field-flex>.mat-form-field-infix {
+        .mat-form-field-flex > .mat-form-field-infix {
             padding: 0.3em 10px !important;
             // width: 150px !important;
         }
@@ -80,7 +109,8 @@
             padding: 0 0.4em 0 0.4em;
         }
 
-        .mat-form-field-appearance-outline.mat-form-field-can-float.mat-form-field-should-float .mat-form-field-label {
+        .mat-form-field-appearance-outline.mat-form-field-can-float.mat-form-field-should-float
+            .mat-form-field-label {
             transform: translateY(-1.1em) scale(0.75);
             width: 133.33333%;
         }

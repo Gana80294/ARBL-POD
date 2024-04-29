@@ -46,8 +46,7 @@ export class DeliveryChallansComponent implements OnInit {
 
     RpodDetailsFormGroup: FormGroup;
     RpodDetailsFormArray: FormArray = this._formBuilder.array([]);
-    //status:any;
-    //@ViewChild('Quantity')Quantity:ElementRef;
+
     notificationSnackBarComponent: NotificationSnackBarComponent;
     public doughnutChartType: ChartType = "doughnut";
     public doughnutChartLabels: any[] = [
@@ -166,8 +165,9 @@ export class DeliveryChallansComponent implements OnInit {
             EndDate: [new Date()],
             PlantList: [[]],
             CustomerName: [null],
-            UserCode: [null],
+            CustomerCode: [null],
             PlantGroupList: [[]],
+            DcNo: [null],
         });
 
         this.currentCustomPage = 1;
@@ -189,7 +189,9 @@ export class DeliveryChallansComponent implements OnInit {
             this.MenuItems =
                 this.authenticationDetails.menuItemNames.split(",");
             if (this.authenticationDetails.userRole == "Customer") {
-                this.getAllReversePODData();
+                // this.getAllReversePODData();
+                this.filterAllReversePODs();
+
             } else if (
                 this.authenticationDetails.userRole == "Amararaja User"
             ) {
@@ -278,7 +280,7 @@ export class DeliveryChallansComponent implements OnInit {
         }
     }
 
-    filterAllReversePODs(): void {
+    filterAllReversePODs(status: string = null): void {
         let filterPayload = new ReversePODFilter();
 
         filterPayload.StartDate = this._datePipe.transform(
@@ -297,20 +299,28 @@ export class DeliveryChallansComponent implements OnInit {
                 ? this.InvoiceFilterFormGroup.get("PlantList").value
                 : this.authenticationDetails.plant ? this.authenticationDetails.plant.split(",") : [];
 
-        filterPayload.UserCode =
-            this.InvoiceFilterFormGroup.get("UserCode").value;
+        filterPayload.CustomerCode =
+            this.InvoiceFilterFormGroup.get("CustomerCode").value;
         filterPayload.CustomerName =
             this.InvoiceFilterFormGroup.get("CustomerName").value;
+        filterPayload.DcNo =
+            this.InvoiceFilterFormGroup.get("DcNo").value;
 
         if (this.authenticationDetails.userRole == "Customer") {
-            filterPayload.UserCode = this.authenticationDetails.userCode;
+            filterPayload.CustomerCode = this.authenticationDetails.userCode;
         }
         filterPayload.CurrentPage = this.currentCustomPage;
         filterPayload.Records = this.records;
-        filterPayload.Status = this.InvoiceFilterFormGroup.get("Status").value;
+        if (status != null) {
+            filterPayload.Status = [status]
+        }
+        else {
+            filterPayload.Status = this.InvoiceFilterFormGroup.get("Status").value;
+        }
 
         if (this.InvoiceFilterFormGroup.valid) {
             this.isProgressBarVisibile = true;
+            // this.filterAllReversePODs1(filterPayload);
             this._reversePod.FilterAllReversePODs(filterPayload).subscribe({
                 next: (res) => {
                     if (res.length < this.records) {
@@ -335,179 +345,6 @@ export class DeliveryChallansComponent implements OnInit {
                 this.InvoiceFilterFormGroup.get(key).markAsDirty();
             });
         }
-    }
-
-    filterAllOpenReversePODs(isCustomer: boolean = false) {
-        this.isProgressBarVisibile = true;
-        let filterPayload = new ReversePODFilter();
-
-        filterPayload.StartDate = this._datePipe.transform(
-            this.InvoiceFilterFormGroup.get("StartDate").value,
-            "yyyy-MM-dd"
-        );
-        filterPayload.EndDate = this._datePipe.transform(
-            this.InvoiceFilterFormGroup.get("EndDate").value,
-            "yyyy-MM-dd"
-        );
-        isCustomer
-            ? (filterPayload.UserCode = this.authenticationDetails.userCode)
-            : (filterPayload.UserCode = null);
-
-        filterPayload.PlantList =
-            this.InvoiceFilterFormGroup.get("PlantList").value &&
-                this.InvoiceFilterFormGroup.get("PlantList").value.length > 0
-                ? this.InvoiceFilterFormGroup.get("PlantList").value
-                : this.authenticationDetails.plant ? this.authenticationDetails.plant.split(",") : [];
-
-        this._reversePod.FilterAllOpenReversePODs(filterPayload).subscribe({
-            next: (res) => {
-                if (res.length < this.records) {
-                    this.isLoadMoreVisible = false;
-                } else {
-                    this.isLoadMoreVisible = true;
-                }
-                this.FilteredRpodDetails = res;
-                this.isProgressBarVisibile = false;
-                this.dataSource = new MatTableDataSource(res);
-                this.dataSource.paginator = this.paginator;
-                this.CreateFormArray();
-                this.updateChartValue();
-            },
-            error: (err) => {
-                this.isProgressBarVisibile = false;
-            },
-        });
-    }
-
-    filterAllIntransitReversePODs(isCustomer: boolean = false) {
-        this.isProgressBarVisibile = true;
-        let filterPayload = new ReversePODFilter();
-
-        filterPayload.StartDate = this._datePipe.transform(
-            this.InvoiceFilterFormGroup.get("StartDate").value,
-            "yyyy-MM-dd"
-        );
-        filterPayload.EndDate = this._datePipe.transform(
-            this.InvoiceFilterFormGroup.get("EndDate").value,
-            "yyyy-MM-dd"
-        );
-        filterPayload.PlantList =
-            this.InvoiceFilterFormGroup.get("PlantList").value &&
-                this.InvoiceFilterFormGroup.get("PlantList").value.length > 0
-                ? this.InvoiceFilterFormGroup.get("PlantList").value
-                : this.authenticationDetails.plant ? this.authenticationDetails.plant.split(",") : [];
-
-        isCustomer
-            ? (filterPayload.UserCode = this.authenticationDetails.userCode)
-            : (filterPayload.UserCode = null);
-
-        this._reversePod
-            .FilterAllInTransitReversePODs(filterPayload)
-            .subscribe({
-                next: (res) => {
-                    if (res.length < this.records) {
-                        this.isLoadMoreVisible = false;
-                    } else {
-                        this.isLoadMoreVisible = true;
-                    }
-                    this.FilteredRpodDetails = res;
-                    this.isProgressBarVisibile = false;
-                    this.dataSource = new MatTableDataSource(res);
-                    this.dataSource.paginator = this.paginator;
-                    this.CreateFormArray();
-                    this.updateChartValue();
-                },
-                error: (err) => {
-                    this.isProgressBarVisibile = false;
-                },
-            });
-    }
-
-    filterAllPartiallyConfirmedReversePODs(isCustomer: boolean = false) {
-        this.isProgressBarVisibile = true;
-        let filterPayload = new ReversePODFilter();
-
-        filterPayload.StartDate = this._datePipe.transform(
-            this.InvoiceFilterFormGroup.get("StartDate").value,
-            "yyyy-MM-dd"
-        );
-        filterPayload.EndDate = this._datePipe.transform(
-            this.InvoiceFilterFormGroup.get("EndDate").value,
-            "yyyy-MM-dd"
-        );
-        isCustomer
-            ? (filterPayload.UserCode = this.authenticationDetails.userCode)
-            : (filterPayload.UserCode = null);
-
-        filterPayload.PlantList =
-            this.InvoiceFilterFormGroup.get("PlantList").value &&
-                this.InvoiceFilterFormGroup.get("PlantList").value.length > 0
-                ? this.InvoiceFilterFormGroup.get("PlantList").value
-                : this.authenticationDetails.plant ? this.authenticationDetails.plant.split(",") : [];
-
-        this._reversePod
-            .FilterAllPartiallyConfirmedReversePODs(filterPayload)
-            .subscribe({
-                next: (res) => {
-                    if (res.length < this.records) {
-                        this.isLoadMoreVisible = false;
-                    } else {
-                        this.isLoadMoreVisible = true;
-                    }
-                    this.FilteredRpodDetails = res;
-                    this.isProgressBarVisibile = false;
-                    this.dataSource = new MatTableDataSource(res);
-                    this.dataSource.paginator = this.paginator;
-                    this.CreateFormArray();
-                    this.updateChartValue();
-                },
-                error: (err) => {
-                    this.isProgressBarVisibile = false;
-                },
-            });
-    }
-
-    filterAllConfirmedReversePODs(isCustomer: boolean = false) {
-        this.isProgressBarVisibile = true;
-        let filterPayload = new ReversePODFilter();
-
-        filterPayload.StartDate = this._datePipe.transform(
-            this.InvoiceFilterFormGroup.get("StartDate").value,
-            "yyyy-MM-dd"
-        );
-        filterPayload.EndDate = this._datePipe.transform(
-            this.InvoiceFilterFormGroup.get("EndDate").value,
-            "yyyy-MM-dd"
-        );
-        filterPayload.PlantList =
-            this.InvoiceFilterFormGroup.get("PlantList").value &&
-                this.InvoiceFilterFormGroup.get("PlantList").value.length > 0
-                ? this.InvoiceFilterFormGroup.get("PlantList").value
-                : this.authenticationDetails.plant ? this.authenticationDetails.plant.split(",") : [];
-        isCustomer
-            ? (filterPayload.UserCode = this.authenticationDetails.userCode)
-            : (filterPayload.UserCode = null);
-
-        this._reversePod
-            .FilterAllConfirmedReversePODs(filterPayload)
-            .subscribe({
-                next: (res) => {
-                    if (res.length < this.records) {
-                        this.isLoadMoreVisible = false;
-                    } else {
-                        this.isLoadMoreVisible = true;
-                    }
-                    this.FilteredRpodDetails = res;
-                    this.isProgressBarVisibile = false;
-                    this.dataSource = new MatTableDataSource(res);
-                    this.dataSource.paginator = this.paginator;
-                    this.CreateFormArray();
-                    this.updateChartValue();
-                },
-                error: (err) => {
-                    this.isProgressBarVisibile = false;
-                },
-            });
     }
 
     getAllReversePODData() {
@@ -586,12 +423,12 @@ export class DeliveryChallansComponent implements OnInit {
             payLoad.DC_RECEIEVED_DATE,
             "yyyy-MM-dd HH:mm:ss"
         );
-        payLoad.Status = this.currentUserRole == 'Customer' ? 1 : 2;
+        payLoad.Code = this.currentUserRole == 'Customer' ? 1 : 2;
         payLoad.DC_ACKNOWLEDGEMENT_DATE =
             this.FilteredRpodDetails[this.selectedIndex].DC_ACKNOWLEDGEMENT_DATE;
         payLoad.STATUS =
             this.FilteredRpodDetails[this.selectedIndex].STATUS;
-        console.log('p',payLoad);
+        console.log('p', payLoad);
 
         const FORMDATA: FormData = new FormData();
 
@@ -602,18 +439,23 @@ export class DeliveryChallansComponent implements OnInit {
             FORMDATA.append("Payload", JSON.stringify(payLoad));
         }
         console.log(FORMDATA);
-        // this.isProgressBarVisibile = true;
-        // this._reversePod.confirmReversePod(FORMDATA).subscribe({
-        //     next: (res) => {
-                // if(res){
-                //     this.isProgressBarVisibile = false;
-                // }
-        //     },
-        //     error: (err) => {
-                //     this.isProgressBarVisibile = false;
-        //     }
-        // });
-        //     this.isProgressBarVisibile = false;
+        this.isProgressBarVisibile = true;
+        this._reversePod.confirmReversePodDirectly(FORMDATA).subscribe({
+            next: (res) => {
+                if (this.authenticationDetails.userRole == "Customer") {
+                    this.getAllReversePODData();
+                } else if (
+                    this.authenticationDetails.userRole == "Amararaja User"
+                ) {
+                    this.filterAllReversePODs();
+                }
+                this.dataSource._updateChangeSubscription();
+                this.isProgressBarVisibile = false;
+            },
+            error: (err) => {
+                this.isProgressBarVisibile = false;
+            }
+        });
     }
 
     handleFileInput(evt) {
@@ -698,7 +540,7 @@ export class DeliveryChallansComponent implements OnInit {
                 payLoad.LR_DATE,
                 "yyyy-MM-dd HH:mm:ss"
             );
-            payLoad.Status = 1;
+            payLoad.Code = 1;
             console.log("payload", payLoad);
             const formData: FormData = new FormData();
 
@@ -749,7 +591,7 @@ export class DeliveryChallansComponent implements OnInit {
                 payLoad.DC_RECEIEVED_DATE,
                 "yyyy-MM-dd HH:mm:ss"
             );
-            payLoad.Status = 2;
+            payLoad.Code = 2;
 
             const formData: FormData = new FormData();
             formData.append("Payload", JSON.stringify(payLoad));
@@ -775,6 +617,27 @@ export class DeliveryChallansComponent implements OnInit {
         }
     }
 
+    filterAllReversePODs1(filterPayload: ReversePODFilter) {
+        this._reversePod.FilterAllReversePODs(filterPayload).subscribe({
+            next: (res) => {
+                if (res.length < this.records) {
+                    this.isLoadMoreVisible = false;
+                } else {
+                    this.isLoadMoreVisible = true;
+                }
+                this.FilteredRpodDetails = res;
+                this.isProgressBarVisibile = false;
+                this.dataSource = new MatTableDataSource(res);
+                this.dataSource.paginator = this.paginator;
+                this.CreateFormArray();
+                this.updateChartValue();
+            },
+            error: (err) => {
+                this.isProgressBarVisibile = false;
+            },
+        });
+    }
+
     doughnutChartClicked(e: any): void {
         if (e.active.length > 0) {
             const chart = e.active[0]._chart;
@@ -788,29 +651,18 @@ export class DeliveryChallansComponent implements OnInit {
                 console.log(clickedElementIndex, label, value);
                 if (label) {
                     if (label.toLowerCase() === "pending") {
-                        if (this.currentUserRole === "Amararaja User") {
-                            this.filterAllOpenReversePODs();
-                        } else if (this.currentUserRole === "Customer") {
-                            this.filterAllOpenReversePODs(true);
-                        }
+                        this.filterAllReversePODs('Open');
+                        // if (this.currentUserRole === "Amararaja User") {
+                        //     this.filterAllOpenReversePODs();
+                        // } else if (this.currentUserRole === "Customer") {
+                        //     this.filterAllOpenReversePODs(true);
+                        // }
                     } else if (label.toLowerCase() === "intransit") {
-                        if (this.currentUserRole === "Amararaja User") {
-                            this.filterAllIntransitReversePODs();
-                        } else if (this.currentUserRole === "Customer") {
-                            this.filterAllIntransitReversePODs(true);
-                        }
+                        this.filterAllReversePODs('In Transit');
                     } else if (label.toLowerCase() === "partially confirmed") {
-                        if (this.currentUserRole === "Amararaja User") {
-                            this.filterAllPartiallyConfirmedReversePODs();
-                        } else if (this.currentUserRole === "Customer") {
-                            this.filterAllPartiallyConfirmedReversePODs(true);
-                        }
+                        this.filterAllReversePODs('Partially Confirmed');
                     } else if (label.toLowerCase() === "confirmed") {
-                        if (this.currentUserRole === "Amararaja User") {
-                            this.filterAllConfirmedReversePODs();
-                        } else if (this.currentUserRole === "Customer") {
-                            this.filterAllConfirmedReversePODs(true);
-                        }
+                        this.filterAllReversePODs('Confirmed');
                     }
                 }
             }
@@ -906,7 +758,7 @@ export class DeliveryChallansComponent implements OnInit {
             payLoad.DC_RECEIEVED_DATE,
             "yyyy-MM-dd HH:mm:ss"
         );
-        payLoad.Status = 2;
+        payLoad.Code = 2;
 
         // if (payLoad.RECEIVED_QUANTITY > payLoad.HAND_OVERED_QUANTITY) {
         //     this.notificationSnackBarComponent.openSnackBar(
@@ -978,8 +830,8 @@ export class DeliveryChallansComponent implements OnInit {
                 ? this.InvoiceFilterFormGroup.get("PlantList").value
                 : this.authenticationDetails.plant ? this.authenticationDetails.plant.split(",") : [];
 
-        filterPayload.UserCode =
-            this.InvoiceFilterFormGroup.get("UserCode").value;
+        filterPayload.CustomerCode =
+            this.InvoiceFilterFormGroup.get("CustomerCode").value;
         filterPayload.CustomerName =
             this.InvoiceFilterFormGroup.get("CustomerName").value;
 

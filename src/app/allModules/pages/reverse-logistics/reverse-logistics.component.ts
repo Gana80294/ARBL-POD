@@ -20,7 +20,9 @@ import { Router } from "@angular/router";
 import { AttachmentDialogComponent } from "app/allModules/reports/attachment-dialog/attachment-dialog.component";
 import {
     AttachmentDetails,
+    AttachmentResponse,
     ReversePOD,
+    ReversePODDashboard,
     ReversePODFilter,
     ReversePodUpdation,
 } from "app/models/invoice-details";
@@ -34,12 +36,33 @@ import { ChartType } from "chart.js";
 import { Guid } from "guid-typescript";
 import { saveAs } from "file-saver";
 import { ShareParameterService } from "app/services/share-parameters.service";
+import {
+    trigger,
+    state,
+    style,
+    transition,
+    animate,
+} from "@angular/animations";
+import { FileSaverService } from "app/services/file-saver.service";
 
 @Component({
     selector: "app-reverse-logistics",
     templateUrl: "./reverse-logistics.component.html",
     styleUrls: ["./reverse-logistics.component.scss"],
     encapsulation: ViewEncapsulation.None,
+    animations: [
+        trigger("detailExpand", [
+            state(
+                "collapsed",
+                style({ height: "0px", minHeight: "0", display: "none" })
+            ),
+            state("expanded", style({ height: "*" })),
+            transition(
+                "expanded <=> collapsed",
+                animate("225ms cubic-bezier(0.4, 0.0, 0.2, 1)")
+            ),
+        ]),
+    ],
 })
 export class ReverseLogisticsComponent implements OnInit {
     InvoiceFilterFormGroup: FormGroup;
@@ -99,24 +122,15 @@ export class ReverseLogisticsComponent implements OnInit {
         "Claim_Type",
         "Customer_Name",
         "Plant_Name",
-        // "Material_Code",
-        // "Quantity",
-        // "Customer_Delivery_Quantity",
-        // "Customer_Pending_Quantity",
-        // "Handovered_Status",
-        "LR_Number",
-        "LR_Date",
-        "CustomerLR",
-        // "DC_Received_Quantity",
-        // "DC_Pending_Quantity",
-        "DC_Received_Date",
-        "DC_Acknowledgement_Date",
         "Status",
-        "DCLR",
         "PENDING_DAYS",
-        // "Remarks",
+        "Total_Qty",
+        "Billed_Qty",
+        "Balance_Qty",
+        "LR_Details",
     ];
-    dataSource = new MatTableDataSource<ReversePOD>();
+    expandedElement: ReversePODDashboard | null;
+    dataSource = new MatTableDataSource<ReversePODDashboard>();
     @ViewChild(MatPaginator) paginator: MatPaginator;
     @ViewChild(MatSort) sort: MatSort;
     @ViewChild("reversePodFileInput") fileInput: ElementRef<HTMLElement>;
@@ -150,6 +164,7 @@ export class ReverseLogisticsComponent implements OnInit {
         private _datePipe: DatePipe,
         private dialog: MatDialog,
         private _shareParameterService: ShareParameterService,
+        private _fileSaver: FileSaverService
     ) {
         this.notificationSnackBarComponent = new NotificationSnackBarComponent(
             this.snackBar
@@ -163,8 +178,9 @@ export class ReverseLogisticsComponent implements OnInit {
             EndDate: [new Date()],
             PlantList: [],
             CustomerName: [null],
-            UserCode: [null],
+            CustomerCode: [null],
             PlantGroupList: [],
+            DcNo:[null]
         });
 
         this.currentCustomPage = 1;
@@ -183,7 +199,8 @@ export class ReverseLogisticsComponent implements OnInit {
             this.MenuItems =
                 this.authenticationDetails.menuItemNames.split(",");
             if (this.authenticationDetails.userRole == "Customer") {
-                this.getAllReversePODData();
+                // this.getAllReversePODData();
+                this.filterAllReversePODs();
             } else if (
                 this.authenticationDetails.userRole == "Amararaja User"
             ) {
@@ -218,7 +235,7 @@ export class ReverseLogisticsComponent implements OnInit {
             });
     }
 
-    filterAllReversePODs(): void {
+    filterAllReversePODs(status:string=null): void {
         this.isProgressBarVisibile = true;
         let filterPayload = new ReversePODFilter();
 
@@ -235,19 +252,28 @@ export class ReverseLogisticsComponent implements OnInit {
             this.InvoiceFilterFormGroup.get("PlantList").value &&
             this.InvoiceFilterFormGroup.get("PlantList").value.length > 0
                 ? this.InvoiceFilterFormGroup.get("PlantList").value
-                : this.authenticationDetails.plant ? this.authenticationDetails.plant.split(",") : [];
+                : this.authenticationDetails.plant
+                ? this.authenticationDetails.plant.split(",")
+                : [];
 
-        filterPayload.UserCode =
-            this.InvoiceFilterFormGroup.get("UserCode").value;
+        filterPayload.CustomerCode =
+            this.InvoiceFilterFormGroup.get("CustomerCode").value;
         filterPayload.CustomerName =
             this.InvoiceFilterFormGroup.get("CustomerName").value;
+            filterPayload.DcNo =
+            this.InvoiceFilterFormGroup.get("DcNo").value;
 
         if (this.authenticationDetails.userRole == "Customer") {
-            filterPayload.UserCode = this.authenticationDetails.userCode;
+            filterPayload.CustomerCode = this.authenticationDetails.userCode;
         }
         filterPayload.CurrentPage = this.currentCustomPage;
         filterPayload.Records = this.records;
-        filterPayload.Status = this.statusList;
+        if(status != null){
+            filterPayload.Status = [status]
+        }
+        else{
+            filterPayload.Status = this.InvoiceFilterFormGroup.get("Status").value;
+        }
 
         this._reversePod.FilterAllReversePODs(filterPayload).subscribe({
             next: (res) => {
@@ -269,175 +295,7 @@ export class ReverseLogisticsComponent implements OnInit {
         });
     }
 
-    filterAllOpenReversePODs(isCustomer: boolean = false) {
-        this.isProgressBarVisibile = true;
-        let filterPayload = new ReversePODFilter();
-
-        filterPayload.StartDate = this._datePipe.transform(
-            this.InvoiceFilterFormGroup.get("StartDate").value,
-            "yyyy-MM-dd"
-        );
-        filterPayload.EndDate = this._datePipe.transform(
-            this.InvoiceFilterFormGroup.get("EndDate").value,
-            "yyyy-MM-dd"
-        );
-        filterPayload.PlantList =
-            this.InvoiceFilterFormGroup.get("PlantList").value &&
-            this.InvoiceFilterFormGroup.get("PlantList").value.length > 0
-                ? this.InvoiceFilterFormGroup.get("PlantList").value
-                : this.authenticationDetails.plant ? this.authenticationDetails.plant.split(",") : [];
-        isCustomer
-            ? (filterPayload.UserCode = this.authenticationDetails.userCode)
-            : (filterPayload.UserCode = null);
-
-        this._reversePod.FilterAllOpenReversePODs(filterPayload).subscribe({
-            next: (res) => {
-                if (res.length < this.records) {
-                    this.isLoadMoreVisible = false;
-                } else {
-                    this.isLoadMoreVisible = true;
-                }
-                res = this.ValueChangeEvents(res);
-                this.FilteredRpodDetails = res;
-                this.isProgressBarVisibile = false;
-                this.dataSource = new MatTableDataSource(res);
-                this.dataSource.paginator = this.paginator;
-                this.updateChartValue();
-            },
-            error: (err) => {
-                this.isProgressBarVisibile = false;
-            },
-        });
-    }
-
-    filterAllIntransitReversePODs(isCustomer: boolean = false) {
-        this.isProgressBarVisibile = true;
-        let filterPayload = new ReversePODFilter();
-
-        filterPayload.StartDate = this._datePipe.transform(
-            this.InvoiceFilterFormGroup.get("StartDate").value,
-            "yyyy-MM-dd"
-        );
-        filterPayload.EndDate = this._datePipe.transform(
-            this.InvoiceFilterFormGroup.get("EndDate").value,
-            "yyyy-MM-dd"
-        );
-        filterPayload.PlantList =
-            this.InvoiceFilterFormGroup.get("PlantList").value &&
-            this.InvoiceFilterFormGroup.get("PlantList").value.length > 0
-                ? this.InvoiceFilterFormGroup.get("PlantList").value
-                : this.authenticationDetails.plant ? this.authenticationDetails.plant.split(",") : [];
-        isCustomer
-            ? (filterPayload.UserCode = this.authenticationDetails.userCode)
-            : (filterPayload.UserCode = null);
-
-        this._reversePod
-            .FilterAllInTransitReversePODs(filterPayload)
-            .subscribe({
-                next: (res) => {
-                    if (res.length < this.records) {
-                        this.isLoadMoreVisible = false;
-                    } else {
-                        this.isLoadMoreVisible = true;
-                    }
-                    res = this.ValueChangeEvents(res);
-                    this.FilteredRpodDetails = res;
-                    this.isProgressBarVisibile = false;
-                    this.dataSource = new MatTableDataSource(res);
-                    this.dataSource.paginator = this.paginator;
-                    this.updateChartValue();
-                },
-                error: (err) => {
-                    this.isProgressBarVisibile = false;
-                },
-            });
-    }
-
-    filterAllPartiallyConfirmedReversePODs(isCustomer: boolean = false) {
-        this.isProgressBarVisibile = true;
-        let filterPayload = new ReversePODFilter();
-
-        filterPayload.StartDate = this._datePipe.transform(
-            this.InvoiceFilterFormGroup.get("StartDate").value,
-            "yyyy-MM-dd"
-        );
-        filterPayload.EndDate = this._datePipe.transform(
-            this.InvoiceFilterFormGroup.get("EndDate").value,
-            "yyyy-MM-dd"
-        );
-        filterPayload.PlantList =
-            this.InvoiceFilterFormGroup.get("PlantList").value &&
-            this.InvoiceFilterFormGroup.get("PlantList").value.length > 0
-                ? this.InvoiceFilterFormGroup.get("PlantList").value
-                : this.authenticationDetails.plant ? this.authenticationDetails.plant.split(",") : [];
-        isCustomer
-            ? (filterPayload.UserCode = this.authenticationDetails.userCode)
-            : (filterPayload.UserCode = null);
-
-        this._reversePod
-            .FilterAllPartiallyConfirmedReversePODs(filterPayload)
-            .subscribe({
-                next: (res) => {
-                    if (res.length < this.records) {
-                        this.isLoadMoreVisible = false;
-                    } else {
-                        this.isLoadMoreVisible = true;
-                    }
-                    res = this.ValueChangeEvents(res);
-                    this.FilteredRpodDetails = res;
-                    this.isProgressBarVisibile = false;
-                    this.dataSource = new MatTableDataSource(res);
-                    this.dataSource.paginator = this.paginator;
-                    this.updateChartValue();
-                },
-                error: (err) => {
-                    this.isProgressBarVisibile = false;
-                },
-            });
-    }
-
-    filterAllConfirmedReversePODs(isCustomer: boolean = false) {
-        this.isProgressBarVisibile = true;
-        let filterPayload = new ReversePODFilter();
-
-        filterPayload.StartDate = this._datePipe.transform(
-            this.InvoiceFilterFormGroup.get("StartDate").value,
-            "yyyy-MM-dd"
-        );
-        filterPayload.EndDate = this._datePipe.transform(
-            this.InvoiceFilterFormGroup.get("EndDate").value,
-            "yyyy-MM-dd"
-        );
-        filterPayload.PlantList =
-            this.InvoiceFilterFormGroup.get("PlantList").value &&
-            this.InvoiceFilterFormGroup.get("PlantList").value.length > 0
-                ? this.InvoiceFilterFormGroup.get("PlantList").value
-                : this.authenticationDetails.plant ? this.authenticationDetails.plant.split(",") : [];
-        isCustomer
-            ? (filterPayload.UserCode = this.authenticationDetails.userCode)
-            : (filterPayload.UserCode = null);
-
-        this._reversePod
-            .FilterAllConfirmedReversePODs(filterPayload)
-            .subscribe({
-                next: (res) => {
-                    if (res.length < this.records) {
-                        this.isLoadMoreVisible = false;
-                    } else {
-                        this.isLoadMoreVisible = true;
-                    }
-                    res = this.ValueChangeEvents(res);
-                    this.FilteredRpodDetails = res;
-                    this.isProgressBarVisibile = false;
-                    this.dataSource = new MatTableDataSource(res);
-                    this.dataSource.paginator = this.paginator;
-                    this.updateChartValue();
-                },
-                error: (err) => {
-                    this.isProgressBarVisibile = false;
-                },
-            });
-    }
+   
 
     ValueChangeEvents(res: any) {
         res.forEach((ele) => {
@@ -458,18 +316,20 @@ export class ReverseLogisticsComponent implements OnInit {
             .GetAllReversePODByCustomer(this.authenticationDetails.userCode)
             .subscribe({
                 next: (res) => {
-                    if (res.length < this.records) {
-                        this.isLoadMoreVisible = false;
-                    } else {
-                        this.isLoadMoreVisible = true;
-                    }
-                    res = this.ValueChangeEvents(res);
-                    console.log(res);
-                    this.FilteredRpodDetails = res;
                     this.isProgressBarVisibile = false;
-                    this.dataSource = new MatTableDataSource(res);
-                    this.dataSource.paginator = this.paginator;
-                    this.updateChartValue();
+                    if(res){
+                        if (res.length < this.records) {
+                            this.isLoadMoreVisible = false;
+                        } else {
+                            this.isLoadMoreVisible = true;
+                        }
+                        res = this.ValueChangeEvents(res);
+                        console.log(res);
+                        this.FilteredRpodDetails = res;
+                        this.dataSource = new MatTableDataSource(res);
+                        this.dataSource.paginator = this.paginator;
+                        this.updateChartValue();
+                    }
                 },
                 error: () => {
                     this.isProgressBarVisibile = false;
@@ -481,18 +341,15 @@ export class ReverseLogisticsComponent implements OnInit {
         let data = [0, 0, 0, 0];
         if (this.FilteredRpodDetails) {
             data = [
-                this.FilteredRpodDetails.filter(
-                    (x) => x.STATUS == "Open"
-                ).length,
-                this.FilteredRpodDetails.filter(
-                    (x) => x.STATUS == "In Transit"
-                ).length,
+                this.FilteredRpodDetails.filter((x) => x.STATUS == "Open")
+                    .length,
+                this.FilteredRpodDetails.filter((x) => x.STATUS == "In Transit")
+                    .length,
                 this.FilteredRpodDetails.filter(
                     (x) => x.STATUS == "Partially Confirmed"
                 ).length,
-                this.FilteredRpodDetails.filter(
-                    (x) => x.STATUS == "Confirmed"
-                ).length,
+                this.FilteredRpodDetails.filter((x) => x.STATUS == "Confirmed")
+                    .length,
             ];
         }
 
@@ -505,29 +362,7 @@ export class ReverseLogisticsComponent implements OnInit {
         el.click();
     }
 
-    // handleFileInput(evt) {
-    //     if (evt.target.files && evt.target.files.length > 0) {
-    //         if (
-    //             Math.round(Number(evt.target.files[0].size) / (1024 * 1024)) <=
-    //             5
-    //         ) {
-    //             this.fileToUploadList = [];
-    //             this.fileToUploadList.push(evt.target.files[0]);
-    //             if (this.authenticationDetails.userRole == "Customer") {
-    //                 this.confirmByCustomer();
-    //             } else if (
-    //                 this.authenticationDetails.userRole == "Amararaja User"
-    //             ) {
-    //                 // this.confirmByDC();
-    //             }
-    //         } else {
-    //             this.notificationSnackBarComponent.openSnackBar(
-    //                 "Please upload file size below 5 MB",
-    //                 SnackBarStatus.danger
-    //             );
-    //         }
-    //     }
-    // }
+
 
     confirmByCustomer() {
         const RpodDetailsFormArray = this.RpodDetailsFormGroup.get(
@@ -553,7 +388,7 @@ export class ReverseLogisticsComponent implements OnInit {
                 payLoad.LR_DATE,
                 "yyyy-MM-dd HH:mm:ss"
             );
-            payLoad.Status = 1;
+            payLoad.Code = 1;
             console.log("payload", payLoad);
             const formData: FormData = new FormData();
 
@@ -580,55 +415,7 @@ export class ReverseLogisticsComponent implements OnInit {
         }
     }
 
-    // confirmByDC() {
-    //     const RpodDetailsFormArray = this.RpodDetailsFormGroup.get(
-    //         "RpodDetails"
-    //     ) as FormArray;
-    //     let selectedRowValue =
-    //         RpodDetailsFormArray.controls[this.selectedIndex].value;
-    //     if (
-    //         selectedRowValue["LR_DATE"] != null &&
-    //         selectedRowValue["LR_DATE"] != undefined &&
-    //         selectedRowValue["LR_NO"] &&
-    //         selectedRowValue["DC_RECEIEVED_DATE"] != null &&
-    //         selectedRowValue["DC_RECEIEVED_DATE"] != undefined
-    //     ) {
-    //         let payLoad = new ReversePodUpdation();
-    //         const RpodFormArray = this.RpodDetailsFormGroup.get(
-    //             "RpodDetails"
-    //         ) as FormArray;
-    //         payLoad = RpodFormArray.controls[this.selectedIndex].value;
-    //         payLoad.RPOD_HEADER_ID =
-    //             this.FilteredRpodDetails[this.selectedIndex].RPOD_HEADER_ID;
-    //         payLoad.DC_RECEIEVED_DATE = this._datePipe.transform(
-    //             payLoad.DC_RECEIEVED_DATE,
-    //             "yyyy-MM-dd HH:mm:ss"
-    //         );
-    //         payLoad.Status = 2;
 
-    //         const formData: FormData = new FormData();
-    //         formData.append("Payload", JSON.stringify(payLoad));
-    //         if (this.fileToUploadList && this.fileToUploadList.length) {
-    //             this.fileToUploadList.forEach((x) => {
-    //                 formData.append(x.name, x, x.name);
-    //             });
-    //             this.isProgressBarVisibile = true;
-    //             this._reversePod.ConfirmInvoiceItems(formData).subscribe({
-    //                 next: (data) => {
-    //                     this.filterAllReversePODs();
-    //                 },
-    //                 error: () => {
-    //                     this.isProgressBarVisibile = false;
-    //                 },
-    //             });
-    //         }
-    //     } else {
-    //         this.notificationSnackBarComponent.openSnackBar(
-    //             "Please fill valid data for LR Details and Received date.",
-    //             SnackBarStatus.danger
-    //         );
-    //     }
-    // }
 
     doughnutChartClicked(e: any): void {
         if (e.active.length > 0) {
@@ -643,29 +430,13 @@ export class ReverseLogisticsComponent implements OnInit {
                 console.log(clickedElementIndex, label, value);
                 if (label) {
                     if (label.toLowerCase() === "pending") {
-                        if (this.currentUserRole === "Amararaja User") {
-                            this.filterAllOpenReversePODs();
-                        } else if (this.currentUserRole === "Customer") {
-                            this.filterAllOpenReversePODs(true);
-                        }
+                        this.filterAllReversePODs('Open');
                     } else if (label.toLowerCase() === "intransit") {
-                        if (this.currentUserRole === "Amararaja User") {
-                            this.filterAllIntransitReversePODs();
-                        } else if (this.currentUserRole === "Customer") {
-                            this.filterAllIntransitReversePODs(true);
-                        }
+                        this.filterAllReversePODs('In Transit');
                     } else if (label.toLowerCase() === "partially confirmed") {
-                        if (this.currentUserRole === "Amararaja User") {
-                            this.filterAllPartiallyConfirmedReversePODs();
-                        } else if (this.currentUserRole === "Customer") {
-                            this.filterAllPartiallyConfirmedReversePODs(true);
-                        }
+                        this.filterAllReversePODs('Partially Confirmed');
                     } else if (label.toLowerCase() === "confirmed") {
-                        if (this.currentUserRole === "Amararaja User") {
-                            this.filterAllConfirmedReversePODs();
-                        } else if (this.currentUserRole === "Customer") {
-                            this.filterAllConfirmedReversePODs(true);
-                        }
+                        this.filterAllReversePODs('Confirmed');
                     }
                 }
             }
@@ -704,97 +475,9 @@ export class ReverseLogisticsComponent implements OnInit {
         el.click();
     }
 
-    // handleFileInput1(evt) {
-    //     if (evt.target.files && evt.target.files.length > 0) {
-    //         if (
-    //             Math.round(Number(evt.target.files[0].size) / (1024 * 1024)) <=
-    //             5
-    //         ) {
-    //             this.fileToUploadList = [];
-    //             this.fileToUploadList.push(evt.target.files[0]);
-    //             const formData: FormData = new FormData();
-    //             formData.append(
-    //                 "HeaderID",
-    //                 this.dataSource.data[
-    //                     this.selectedIndex
-    //                 ].RPOD_HEADER_ID.toString()
-    //             );
-    //             if (this.fileToUploadList && this.fileToUploadList.length) {
-    //                 this.fileToUploadList.forEach((x) => {
-    //                     formData.append(x.name, x, x.name);
-    //                 });
-    //             }
-    //             this.isProgressBarVisibile = true;
-    //             this._reversePod.ReUploadReversePodLr(formData).subscribe({
-    //                 next: (res) => {
-    //                     this.notificationSnackBarComponent.openSnackBar(
-    //                         "LR copy updated successfully",
-    //                         SnackBarStatus.success
-    //                     );
-    //                 },
-    //                 error: (err) => {
-    //                     this.notificationSnackBarComponent.openSnackBar(
-    //                         err instanceof Object
-    //                             ? "Something went wrong"
-    //                             : err,
-    //                         SnackBarStatus.danger
-    //                     );
-    //                 },
-    //             });
-    //         } else {
-    //             this.notificationSnackBarComponent.openSnackBar(
-    //                 "Please upload file size below 5 MB",
-    //                 SnackBarStatus.danger
-    //             );
-    //         }
-    //     }
-    // }
+    
 
-    // ConfirmQty(ind: number) {
-    //     const RPODFORMARRAY = this.RpodDetailsFormGroup.get(
-    //         "RpodDetails"
-    //     ) as FormArray;
-    //     var payLoad = new ReversePodUpdation();
-    //     payLoad = RPODFORMARRAY.controls[ind].value;
-    //     payLoad.RPOD_HEADER_ID = this.FilteredRpodDetails[ind].RPOD_HEADER_ID;
-    //     payLoad.DC_RECEIEVED_DATE = this._datePipe.transform(
-    //         payLoad.DC_RECEIEVED_DATE,
-    //         "yyyy-MM-dd HH:mm:ss"
-    //     );
-    //     payLoad.Status = 2;
-
-    //     if (payLoad.RECEIVED_QUANTITY > payLoad.HAND_OVERED_QUANTITY) {
-    //         this.notificationSnackBarComponent.openSnackBar(
-    //             "Received quantity can not be greater than handovered quantity",
-    //             SnackBarStatus.danger
-    //         );
-    //     } else if (
-    //         payLoad.RECEIVED_QUANTITY > this.FilteredRpodDetails[ind].Quantity
-    //     ) {
-    //         this.notificationSnackBarComponent.openSnackBar(
-    //             "Received quantity can not be greater than actual quantity",
-    //             SnackBarStatus.danger
-    //         );
-    //     } else {
-    //         this._reversePod.ConfirmReversePodQty(payLoad).subscribe({
-    //             next: (res) => {
-    //                 if (res) {
-    //                     this.notificationSnackBarComponent.openSnackBar(
-    //                         "Quantity details updatd successfully.",
-    //                         SnackBarStatus.success
-    //                     );
-    //                     this.filterAllReversePODs();
-    //                 }
-    //             },
-    //             error: (err) => {
-    //                 this.notificationSnackBarComponent.openSnackBar(
-    //                     err instanceof Object ? "Something went wrong" : err,
-    //                     SnackBarStatus.danger
-    //                 );
-    //             },
-    //         });
-    //     }
-    // }
+  
 
     OpenAttachmentDialog(FileName: string, blob: Blob) {
         const attachmentDetails: AttachmentDetails = {
@@ -831,10 +514,12 @@ export class ReverseLogisticsComponent implements OnInit {
             this.InvoiceFilterFormGroup.get("PlantList").value &&
             this.InvoiceFilterFormGroup.get("PlantList").value.length > 0
                 ? this.InvoiceFilterFormGroup.get("PlantList").value
-                : this.authenticationDetails.plant ? this.authenticationDetails.plant.split(",") : [];
+                : this.authenticationDetails.plant
+                ? this.authenticationDetails.plant.split(",")
+                : [];
 
-        filterPayload.UserCode =
-            this.InvoiceFilterFormGroup.get("UserCode").value;
+        filterPayload.CustomerCode =
+            this.InvoiceFilterFormGroup.get("CustomerCode").value;
         filterPayload.CustomerName =
             this.InvoiceFilterFormGroup.get("CustomerName").value;
 
@@ -872,8 +557,49 @@ export class ReverseLogisticsComponent implements OnInit {
         return this.pageIndex * this.pageSize + ind;
     }
 
-    goToReverseLogisticsItem(revLogDetails:ReversePOD){
+    goToReverseLogisticsItem(revLogDetails: ReversePOD) {
         this._shareParameterService.setReverseLogisticDetail(revLogDetails);
         this._router.navigate(["/pages/reverseLogisticsItem"]);
+    }
+
+    viewAttachment(id: number) {
+        this.isProgressBarVisibile = true;
+        this._reversePod.DownloadRPODDocument(id).subscribe({
+            next: (res) => {
+                this.isProgressBarVisibile = false;
+                if (res) {
+                    this.openAttachmentDialog(res as AttachmentResponse);
+                }
+            },
+            error: (err) => {
+                this.isProgressBarVisibile = false;
+                this.notificationSnackBarComponent.openSnackBar(
+                    err.toString(),
+                    SnackBarStatus.danger
+                );
+            },
+        });
+    }
+
+    openAttachmentDialog(fileData: AttachmentResponse) {
+        const BLOB = this._fileSaver.getBlobData(fileData);
+        const attachmentDetails: AttachmentDetails = {
+            FileName: fileData.FileName,
+            blob: BLOB,
+        };
+
+        const DIALOG_CONFIG: MatDialogConfig = {
+            data: attachmentDetails,
+            panelClass: "attachment-dialog",
+        };
+        const DIALOG_REF = this.dialog.open(
+            AttachmentDialogComponent,
+            DIALOG_CONFIG
+        );
+
+        DIALOG_REF.afterClosed().subscribe({
+            next: (res) => {},
+            error: (err) => {},
+        });
     }
 }
