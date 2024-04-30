@@ -85,7 +85,7 @@ import { forkJoin } from "rxjs";
     ],
 })
 export class ReverseLogisticsItemComponent implements OnInit {
-    selectedReverseLogisticDetail: ReversePOD;
+    selectedReverseLogisticDetail: any;
     reverseLogisticsItemFormGroup: FormGroup;
     authenticationDetails: AuthenticationDetails;
     currentUserID: Guid;
@@ -184,7 +184,7 @@ export class ReverseLogisticsItemComponent implements OnInit {
         private _datePipe: DatePipe,
         private _reversePodService: ReversePodService,
         private _fileSaver: FileSaverService
-    ) {}
+    ) { }
 
     ngOnInit(): void {
         // Retrive authorizationData
@@ -217,12 +217,12 @@ export class ReverseLogisticsItemComponent implements OnInit {
         if (!this.selectedReverseLogisticDetail) {
             this._router.navigate(["pages/deliverychallan"]);
         }
-
+        let lrDetail = this.selectedReverseLogisticDetail.LR_DETAILS[this.selectedReverseLogisticDetail.LR_DETAILS.length - 1];
         this.reverseLogisticsItemFormGroup.patchValue({
-            LR_NO: this.selectedReverseLogisticDetail.LR_NO,
-            LR_DATE: this.selectedReverseLogisticDetail.LR_DATE,
+            LR_NO: lrDetail ? lrDetail.LR_NO : '',
+            LR_DATE: lrDetail ? lrDetail.LR_DATE : '',
             DC_RECEIEVED_DATE:
-                this.selectedReverseLogisticDetail.DC_RECEIEVED_DATE,
+                lrDetail? lrDetail.DC_RECEIEVED_DATE : '',
         });
 
         //get material details api call
@@ -233,6 +233,11 @@ export class ReverseLogisticsItemComponent implements OnInit {
         this.getReversePodLRDetails(
             this.selectedReverseLogisticDetail.RPOD_HEADER_ID
         );
+
+        if (this.currentUserRole.toLowerCase() == 'amararaja user') {
+            this.reverseLogisticsItemFormGroup.get("LR_NO").disable();
+            this.reverseLogisticsItemFormGroup.get("LR_DATE").disable();
+        }
     }
 
     addRpodForm(materialDetail: ReversePodMaterialDetail) {
@@ -293,7 +298,7 @@ export class ReverseLogisticsItemComponent implements OnInit {
                     console.log(this.dataSource);
                 }
             },
-            (err) => {}
+            (err) => { }
         );
     }
 
@@ -306,7 +311,7 @@ export class ReverseLogisticsItemComponent implements OnInit {
                     );
                 }
             },
-            (err) => {}
+            (err) => { }
         );
     }
 
@@ -380,7 +385,7 @@ export class ReverseLogisticsItemComponent implements OnInit {
             } else if (
                 this.currentUserRole != "Customer" &&
                 rPOdFormArray[i].value.HAND_OVERED_QUANTITY <
-                    rPOdFormArray[i].value.RECEIVED_QUANTITY
+                rPOdFormArray[i].value.RECEIVED_QUANTITY
             ) {
                 return false;
             } else if (rPOdFormArray[i].value.RECEIVED_QUANTITY < 0) {
@@ -446,10 +451,10 @@ export class ReverseLogisticsItemComponent implements OnInit {
             this.currentUserRole == "Customer"
                 ? "In Transit"
                 : this.dataSource.data.some((x) =>
-                      x.STATUS.toLowerCase().includes("partially confirmed")
-                  )
-                ? "Partially Confirmed"
-                : "Confirmed";
+                    x.STATUS.toLowerCase().includes("partially confirmed")
+                )
+                    ? "Partially Confirmed"
+                    : "Confirmed";
 
         const RPODFORMARRAY = this.reverseLogisticsItemFormGroup.get(
             "RPodItemArray"
@@ -592,18 +597,16 @@ export class ReverseLogisticsItemComponent implements OnInit {
         if (this.currentUserRole == "Customer") {
             return (
                 this.selectedReverseLogisticDetail.STATUS.toLowerCase() ==
-                    "open" ||
+                "open" ||
                 this.selectedReverseLogisticDetail.STATUS.toLowerCase() ==
-                    "partially confirmed"
+                "partially confirmed"
             );
         } else if (this.currentUserRole.toLowerCase() == "amararaja user") {
             return (
                 this.selectedReverseLogisticDetail.STATUS.toLowerCase() ==
-                    "open" ||
+                "in transit" ||
                 this.selectedReverseLogisticDetail.STATUS.toLowerCase() ==
-                    "in transit" ||
-                this.selectedReverseLogisticDetail.STATUS.toLowerCase() ==
-                    "partially confirmed"
+                "partially confirmed"
             );
         } else {
             return false;
@@ -646,8 +649,8 @@ export class ReverseLogisticsItemComponent implements OnInit {
         );
 
         DIALOG_REF.afterClosed().subscribe({
-            next: (res) => {},
-            error: (err) => {},
+            next: (res) => { },
+            error: (err) => { },
         });
     }
 }

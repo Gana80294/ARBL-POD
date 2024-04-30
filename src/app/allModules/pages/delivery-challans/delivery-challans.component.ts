@@ -23,6 +23,7 @@ import {
     ReversePodUpdation,
     AttachmentDetails,
     ReversePodItemUpdation,
+    ReversePODDashboard,
 } from "app/models/invoice-details";
 import { AuthenticationDetails, Plant, PlantGroup } from "app/models/master";
 import { NotificationSnackBarComponent } from "app/notifications/notification-snack-bar/notification-snack-bar.component";
@@ -400,7 +401,7 @@ export class DeliveryChallansComponent implements OnInit {
             el.click();
         } else {
             let msg = this.currentUserRole == 'Customer' ?
-                'Please fill LR No & LR Date' : 'Please fill LR No, LR Date and DC Received Date';
+                'Please fill LR No & LR Date' : 'Please fill DC Received Date';
             this.notificationSnackBarComponent.openSnackBar(
                 msg,
                 SnackBarStatus.danger
@@ -483,17 +484,22 @@ export class DeliveryChallansComponent implements OnInit {
         }
     }
 
-    InsertRpodDetailsFormGroup(asnItem: ReversePOD, ind: number): void {
+    InsertRpodDetailsFormGroup(asnItem: ReversePODDashboard, ind: number): void {
+        let lrDetails = asnItem.LR_DETAILS[asnItem.LR_DETAILS.length -1];
         const row = this._formBuilder.group({
             // HAND_OVERED_QUANTITY: [asnItem.HAND_OVERED_QUANTITY],
             // RECEIVED_QUANTITY: [asnItem.RECEIVED_QUANTITY],
-            LR_DATE: [asnItem.LR_DATE],
-            LR_NO: [asnItem.LR_NO],
+            LR_DATE: [lrDetails ? lrDetails.LR_DATE : ''],
+            LR_NO: [lrDetails ? lrDetails.LR_NO : ''],
             // REMARKS: [asnItem.REMARKS],
-            DC_RECEIEVED_DATE: [asnItem.DC_RECEIEVED_DATE],
+            DC_RECEIEVED_DATE: [lrDetails ?lrDetails.DC_RECEIEVED_DATE:''],
         });
         if (this.currentUserRole == 'Customer') {
             row.get('DC_RECEIEVED_DATE').disable();
+        }
+        if(this.currentUserRole.toLowerCase() == 'amararaja user'){
+            row.get('LR_NO').disable();
+            row.get('LR_DATE').disable();
         }
 
         // this.dataSource.data[ind].CUSTOMER_PENDING_QUANTITY =
@@ -872,25 +878,5 @@ export class DeliveryChallansComponent implements OnInit {
     goToReverseLogisticsItem(revLogDetails: ReversePOD) {
         this._shareParameterService.setReverseLogisticDetail(revLogDetails);
         this._router.navigate(["/pages/reverseLogisticsItem"]);
-    }
-
-    c(ind) {
-        const RPODFORMARRAY = this.RpodDetailsFormGroup.get("RpodDetails") as FormArray;
-        const LRNO = RPODFORMARRAY.controls[ind].get('LR_NO').value;
-        const LRDATE = RPODFORMARRAY.controls[ind].get('LR_DATE').value;
-        const DCRECEDATE = RPODFORMARRAY.controls[ind].get('DC_RECEIEVED_DATE').value;
-
-        if (LRNO && LRDATE && (this.currentUserRole !== 'Customer' ? DCRECEDATE : true)) {
-            this.selectedIndex = ind;
-            const el: HTMLElement = this.fileInput.nativeElement;
-            el.click();
-        } else {
-            let msg = this.currentUserRole == 'Customer' ?
-                'Please fill LR No & LR Date' : 'Please fill LR No, LR Date and DC Received Date';
-            this.notificationSnackBarComponent.openSnackBar(
-                msg,
-                SnackBarStatus.danger
-            );
-        }
     }
 }
