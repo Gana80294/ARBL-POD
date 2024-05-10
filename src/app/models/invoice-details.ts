@@ -298,6 +298,7 @@ export class ReversePODDashboard {
     BILLED_QUANTITY: number;
     BALANCE_QUANTITY: number;
     LR_DETAILS: ReversePodLrDetails[] = [];
+    DC_ACKNOWLEDGEMENT_DATE:Date|string|null;
 }
 
 export class ReversePodLrDetails {

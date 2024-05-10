@@ -41,6 +41,7 @@ import {
     InvoiceUpdation,
     LRWithVehicleUnloaded,
     ReversePOD,
+    ReversePODDashboard,
     ReversePodItemUpdation,
     ReversePodLrDetails,
     ReversePodMaterialDetail,
@@ -85,7 +86,7 @@ import { forkJoin } from "rxjs";
     ],
 })
 export class ReverseLogisticsItemComponent implements OnInit {
-    selectedReverseLogisticDetail: any;
+    selectedReverseLogisticDetail: ReversePODDashboard;
     reverseLogisticsItemFormGroup: FormGroup;
     authenticationDetails: AuthenticationDetails;
     currentUserID: Guid;
@@ -184,7 +185,11 @@ export class ReverseLogisticsItemComponent implements OnInit {
         private _datePipe: DatePipe,
         private _reversePodService: ReversePodService,
         private _fileSaver: FileSaverService
-    ) { }
+    ) {
+        this.notificationSnackBarComponent = new NotificationSnackBarComponent(
+            this.snackBar
+        );
+    }
 
     ngOnInit(): void {
         // Retrive authorizationData
@@ -198,6 +203,7 @@ export class ReverseLogisticsItemComponent implements OnInit {
             this.currentUserCode = this.authenticationDetails.userCode;
             this.currentUserRole = this.authenticationDetails.userRole;
             this.initialActivities();
+            this.maxDate = new Date();
         } else {
             this._router.navigate(["/auth/login"]);
         }
@@ -222,8 +228,9 @@ export class ReverseLogisticsItemComponent implements OnInit {
             LR_NO: lrDetail ? lrDetail.LR_NO : '',
             LR_DATE: lrDetail ? lrDetail.LR_DATE : '',
             DC_RECEIEVED_DATE:
-                lrDetail? lrDetail.DC_RECEIEVED_DATE : '',
+                lrDetail ? lrDetail.DC_RECEIEVED_DATE : '',
         });
+        this.selectedReverseLogisticDetail.DC_ACKNOWLEDGEMENT_DATE = lrDetail ? lrDetail.DC_ACKNOWLEDGEMENT_DATE : '';
 
         //get material details api call
         this.getReversePodMaterialDetails(
@@ -243,12 +250,13 @@ export class ReverseLogisticsItemComponent implements OnInit {
     addRpodForm(materialDetail: ReversePodMaterialDetail) {
         console.log(materialDetail);
         let receivedQty1: number = 0;
-        if (this.currentUserRole == "Customer") {
+        if (this.currentUserRole == "Customer" && materialDetail.STATUS.toLowerCase() == 'open') {
             receivedQty1 = 0;
         } else {
-            receivedQty1 = materialDetail.HAND_OVERED_QUANTITY
-                ? materialDetail.HAND_OVERED_QUANTITY
-                : materialDetail.QUANTITY;
+            receivedQty1 = materialDetail.RECEIVED_QUANTITY ? materialDetail.RECEIVED_QUANTITY :
+                materialDetail.HAND_OVERED_QUANTITY
+                    ? materialDetail.HAND_OVERED_QUANTITY
+                    : materialDetail.QUANTITY;
         }
 
         console.log(materialDetail.HAND_OVERED_QUANTITY);
@@ -315,7 +323,7 @@ export class ReverseLogisticsItemComponent implements OnInit {
         );
     }
 
-    handOveredQtyValidation(event, actualQty: number, index: number) {
+    handOveredQtyValidation(event, actualQty: number,rQty, index: number) {
         let handOveredQty = event.target.value;
         console.log(this.dataSource);
         console.log(handOveredQty, actualQty, index);
@@ -325,6 +333,8 @@ export class ReverseLogisticsItemComponent implements OnInit {
         } else if (handOveredQty < actualQty) {
             this.dataSource.data[index].STATUS = "Partially Confirmed";
         }
+        this.dataSource.data[index].CUSTOMER_PENDING_QUANTITY = actualQty - handOveredQty;
+        this.dataSource.data[index].DC_PENDING_QUANTITY = handOveredQty - rQty;
         console.log(this.dataSource.data[index]);
         this.dataSource._updateChangeSubscription();
     }
@@ -343,6 +353,7 @@ export class ReverseLogisticsItemComponent implements OnInit {
         if (receivedQty < hqty || hqty < actualQty) {
             this.dataSource.data[index].STATUS = "Partially Confirmed";
         }
+        this.dataSource.data[index].DC_PENDING_QUANTITY =  hqty - receivedQty;
         this.dataSource._updateChangeSubscription();
     }
 
@@ -427,14 +438,21 @@ export class ReverseLogisticsItemComponent implements OnInit {
     }
 
     confirmRpod() {
+        let lrD = this.selectedReverseLogisticDetail.LR_DETAILS;
+        let lr = lrD[lrD.length - 1];
+        console.log('last lr', lr);
         let payLoad = new ReversePodUpdation();
-
         payLoad.RPOD_HEADER_ID =
             this.selectedReverseLogisticDetail.RPOD_HEADER_ID;
         payLoad.LR_NO = this.reverseLogisticsItemFormGroup.value["LR_NO"];
         payLoad.LR_DATE = this.reverseLogisticsItemFormGroup.value["LR_DATE"];
         payLoad.DC_RECEIEVED_DATE =
             this.reverseLogisticsItemFormGroup.get("DC_RECEIEVED_DATE").value;
+        payLoad.Code = this.currentUserRole == "Customer" ? 1 : 2;
+        if (payLoad.Code == 2) {
+            payLoad.LR_NO = lr.LR_NO;
+            payLoad.LR_DATE = lr.LR_DATE;
+        }
         payLoad.LR_DATE = this._datePipe.transform(
             payLoad.LR_DATE,
             "yyyy-MM-dd HH:mm:ss"
@@ -443,9 +461,6 @@ export class ReverseLogisticsItemComponent implements OnInit {
             payLoad.DC_RECEIEVED_DATE,
             "yyyy-MM-dd HH:mm:ss"
         );
-        payLoad.Code = this.currentUserRole == "Customer" ? 1 : 2;
-        payLoad.DC_ACKNOWLEDGEMENT_DATE =
-            this.selectedReverseLogisticDetail.DC_ACKNOWLEDGEMENT_DATE;
         payLoad.STATUS = this.selectedReverseLogisticDetail.STATUS;
         payLoad.STATUS =
             this.currentUserRole == "Customer"
@@ -471,6 +486,7 @@ export class ReverseLogisticsItemComponent implements OnInit {
             rpodItem.STATUS = element.STATUS;
             payLoad.MATERIALS.push(rpodItem);
         });
+        console.log(payLoad);
 
         const FORMDATA: FormData = new FormData();
 

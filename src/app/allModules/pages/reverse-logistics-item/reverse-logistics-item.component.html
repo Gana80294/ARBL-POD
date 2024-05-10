@@ -110,6 +110,7 @@
                                             [matDatepicker]="pickerLrDate"
                                             formControlName="LR_DATE"
                                             (click)="pickerLrDate.open()"
+                                            [max]="maxDate"
                                         />
                                         <mat-datepicker-toggle
                                             matSuffix
@@ -141,7 +142,6 @@
                                     >
                                         <input
                                             matInput
-                                            readOnly
                                             [matDatepicker]="pickerdcReceDate"
                                             formControlName="DC_RECEIEVED_DATE"
                                             [disabled]="
@@ -149,6 +149,7 @@
                                             "
                                             readonly
                                             (click)="pickerdcReceDate.open()"
+                                            [max]="maxDate"
                                         />
                                         <mat-datepicker-toggle
                                             matSuffix
@@ -329,6 +330,7 @@
                                                 handOveredQtyValidation(
                                                     $event,
                                                     element.QUANTITY,
+                                                    element.RECEIVED_QUANTITY,
                                                     index
                                                 )
                                             "

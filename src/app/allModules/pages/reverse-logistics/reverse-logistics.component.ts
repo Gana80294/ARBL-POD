@@ -557,7 +557,7 @@ export class ReverseLogisticsComponent implements OnInit {
         return this.pageIndex * this.pageSize + ind;
     }
 
-    goToReverseLogisticsItem(revLogDetails: ReversePOD) {
+    goToReverseLogisticsItem(revLogDetails: ReversePODDashboard) {
         this._shareParameterService.setReverseLogisticDetail(revLogDetails);
         this._router.navigate(["/pages/reverseLogisticsItem"]);
     }

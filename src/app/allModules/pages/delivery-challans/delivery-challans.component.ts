@@ -109,7 +109,7 @@ export class DeliveryChallansComponent implements OnInit {
         "PENDING_DAYS",
         "Action",
     ];
-    dataSource = new MatTableDataSource<ReversePOD>();
+    dataSource = new MatTableDataSource<ReversePODDashboard>();
     @ViewChild(MatPaginator) paginator: MatPaginator;
     @ViewChild(MatSort) sort: MatSort;
     @ViewChild("reversePodFileInput") fileInput: ElementRef<HTMLElement>;
@@ -142,6 +142,7 @@ export class DeliveryChallansComponent implements OnInit {
     currentCustomPage: number;
     records: number;
     isLoadMoreVisible: boolean;
+    maxDate: Date = new Date();
     constructor(
         private _formBuilder: FormBuilder,
         private _dashboard: DashboardService,
@@ -409,6 +410,8 @@ export class DeliveryChallansComponent implements OnInit {
         }
     }
     confirmRpod() {
+        let lr = this.dataSource.data[this.selectedIndex].LR_DETAILS;
+        let lrDetail = lr[lr.length - 1];
         let payLoad = new ReversePodUpdation();
         const RpodFormArray = this.RpodDetailsFormGroup.get(
             "RpodDetails"
@@ -416,6 +419,15 @@ export class DeliveryChallansComponent implements OnInit {
         payLoad = RpodFormArray.controls[this.selectedIndex].value;
         payLoad.RPOD_HEADER_ID =
             this.FilteredRpodDetails[this.selectedIndex].RPOD_HEADER_ID;
+        payLoad.Code = this.currentUserRole == 'Customer' ? 1 : 2;
+        if (payLoad.Code == 2) {
+            payLoad.LR_NO = lrDetail.LR_NO;
+            payLoad.LR_DATE = lrDetail.LR_DATE;
+        }
+        payLoad.DC_ACKNOWLEDGEMENT_DATE =
+            this.FilteredRpodDetails[this.selectedIndex].DC_ACKNOWLEDGEMENT_DATE;
+        payLoad.STATUS =
+            this.FilteredRpodDetails[this.selectedIndex].STATUS;
         payLoad.LR_DATE = this._datePipe.transform(
             payLoad.LR_DATE,
             "yyyy-MM-dd HH:mm:ss"
@@ -424,11 +436,6 @@ export class DeliveryChallansComponent implements OnInit {
             payLoad.DC_RECEIEVED_DATE,
             "yyyy-MM-dd HH:mm:ss"
         );
-        payLoad.Code = this.currentUserRole == 'Customer' ? 1 : 2;
-        payLoad.DC_ACKNOWLEDGEMENT_DATE =
-            this.FilteredRpodDetails[this.selectedIndex].DC_ACKNOWLEDGEMENT_DATE;
-        payLoad.STATUS =
-            this.FilteredRpodDetails[this.selectedIndex].STATUS;
         console.log('p', payLoad);
 
         const FORMDATA: FormData = new FormData();
@@ -485,19 +492,19 @@ export class DeliveryChallansComponent implements OnInit {
     }
 
     InsertRpodDetailsFormGroup(asnItem: ReversePODDashboard, ind: number): void {
-        let lrDetails = asnItem.LR_DETAILS[asnItem.LR_DETAILS.length -1];
+        let lrDetails = asnItem.LR_DETAILS[asnItem.LR_DETAILS.length - 1];
         const row = this._formBuilder.group({
             // HAND_OVERED_QUANTITY: [asnItem.HAND_OVERED_QUANTITY],
             // RECEIVED_QUANTITY: [asnItem.RECEIVED_QUANTITY],
             LR_DATE: [lrDetails ? lrDetails.LR_DATE : ''],
             LR_NO: [lrDetails ? lrDetails.LR_NO : ''],
             // REMARKS: [asnItem.REMARKS],
-            DC_RECEIEVED_DATE: [lrDetails ?lrDetails.DC_RECEIEVED_DATE:''],
+            DC_RECEIEVED_DATE: [lrDetails ? lrDetails.DC_RECEIEVED_DATE : ''],
         });
         if (this.currentUserRole == 'Customer') {
             row.get('DC_RECEIEVED_DATE').disable();
         }
-        if(this.currentUserRole.toLowerCase() == 'amararaja user'){
+        if (this.currentUserRole.toLowerCase() == 'amararaja user') {
             row.get('LR_NO').disable();
             row.get('LR_DATE').disable();
         }
@@ -875,7 +882,7 @@ export class DeliveryChallansComponent implements OnInit {
         return this.pageIndex * this.pageSize + ind;
     }
 
-    goToReverseLogisticsItem(revLogDetails: ReversePOD) {
+    goToReverseLogisticsItem(revLogDetails: ReversePODDashboard) {
         this._shareParameterService.setReverseLogisticDetail(revLogDetails);
         this._router.navigate(["/pages/reverseLogisticsItem"]);
     }

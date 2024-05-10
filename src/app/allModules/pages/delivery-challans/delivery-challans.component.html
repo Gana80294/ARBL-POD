@@ -170,7 +170,7 @@
                             <td mat-cell *matCellDef="let element; let index = index"
                                 [formGroupName]="getFormGroupIndex(index)">
                                 <mat-form-field class="pl-8 pr-12" appearance="outline">
-                                    <input matInput [matDatepicker]="pickerRpodLr" formControlName="LR_DATE" [min]="
+                                    <input matInput readonly [matDatepicker]="pickerRpodLr" formControlName="LR_DATE" [min]="
                                           RpodDetailsFormGroup.get(
                                               'RpodDetails'
                                           ).controls[index]?.get('LR_DATE')
@@ -211,7 +211,7 @@
                             <td mat-cell *matCellDef="let element; let index = index"
                                 [formGroupName]="getFormGroupIndex(index)">
                                 <mat-form-field class="pl-8 pr-12" appearance="outline">
-                                    <input matInput [matDatepicker]="dcReceivedLr" formControlName="DC_RECEIEVED_DATE"
+                                    <input readonly matInput [matDatepicker]="dcReceivedLr" formControlName="DC_RECEIEVED_DATE"
                                         [min]="
                                           RpodDetailsFormGroup.get(
                                               'RpodDetails'
@@ -224,8 +224,7 @@
                                                 )?.value
                                               
                                               : minDate
-                                      " [max]="maxDate" (click)="dcReceivedLr.open()"
-                                        [readonly]="authenticationDetails.userRole === 'Customer'" />
+                                      " [max]="maxDate" (click)="dcReceivedLr.open()" />
                                     <mat-datepicker-toggle matSuffix [for]="dcReceivedLr">
                                     </mat-datepicker-toggle>
                                     <mat-datepicker #dcReceivedLr></mat-datepicker>
