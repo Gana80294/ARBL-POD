@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator, MatSnackBar, MatSort, MatTableDataSource } from '@angular/material';
 import { Router } from '@angular/router';
-import { UserWithRole } from 'app/models/master';
+import { AuthenticationDetails, UserWithRole } from 'app/models/master';
 import { NotificationSnackBarComponent } from 'app/notifications/notification-snack-bar/notification-snack-bar.component';
 import { SnackBarStatus } from 'app/notifications/snackbar-status-enum';
 import { MasterService } from 'app/services/master.service';
@@ -28,6 +28,8 @@ export class UnlockUserComponent implements OnInit {
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
+  MenuItems: string[];
+  authenticationDetails: AuthenticationDetails;
   IsProgressBarVisibile: boolean = false;
   constructor(
     private _master: MasterService,
@@ -38,7 +40,20 @@ export class UnlockUserComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.getAllLockedUsers();
+    const retrievedObject = sessionStorage.getItem('authorizationData');
+    if (retrievedObject) {
+      this.authenticationDetails = JSON.parse(retrievedObject) as AuthenticationDetails;
+      this.MenuItems = this.authenticationDetails.menuItemNames.split(',');
+      if (this.MenuItems.indexOf('UnlockUser') < 0) {
+        this.notificationSnackBarComponent.openSnackBar('You do not have permission to visit this page', SnackBarStatus.danger);
+        this._router.navigate(['/auth/login']);
+      }
+
+      this.getAllLockedUsers();
+    } else {
+      this._router.navigate(['/auth/login']);
+    }
+    
   }
 
   getAllLockedUsers() {

@@ -17,7 +17,7 @@ export class DeleteInvoiceComponent implements OnInit {
     DeleteInvoiceFormGroup: FormGroup;
     authenticationDetails: AuthenticationDetails;
     notificationSnackBarComponent: NotificationSnackBarComponent;
-
+    MenuItems: string[];
     InvoiceData: any;
 
     constructor(
@@ -34,11 +34,21 @@ export class DeleteInvoiceComponent implements OnInit {
         this.DeleteInvoiceFormGroup = new FormGroup({
             InvoiceNo: new FormControl("", [Validators.required]),
         });
+
         const retrievedObject = sessionStorage.getItem("authorizationData");
         if (retrievedObject) {
             this.authenticationDetails = JSON.parse(
                 retrievedObject
             ) as AuthenticationDetails;
+            this.MenuItems =
+                this.authenticationDetails.menuItemNames.split(",");
+            if (this.MenuItems.indexOf("DeleteInvoice") < 0) {
+                this.notificationSnackBarComponent.openSnackBar(
+                    "You do not have permission to visit this page",
+                    SnackBarStatus.danger
+                );
+                this._router.navigate(["/auth/login"]);
+            }
         } else {
             this._router.navigate(["/auth/login"]);
         }
@@ -83,11 +93,11 @@ export class DeleteInvoiceComponent implements OnInit {
 
     SearchInvoice(InvoiceNo: string) {
         this._invoiceService.SearchInvoices(InvoiceNo).subscribe({
-            next: (data) => { 
+            next: (data) => {
                 console.log(data);
                 this.InvoiceData = data;
             },
-            error: (err) => { }
+            error: (err) => {},
         });
     }
 }

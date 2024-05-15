@@ -32,8 +32,6 @@ import { BnNgIdleService } from "bn-ng-idle";
 
 
 
-
-
 const appRoutes: Routes = [
     {
         path: 'auth',
